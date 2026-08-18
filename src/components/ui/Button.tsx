@@ -5,7 +5,7 @@ type BaseProps = {
   children: ReactNode;
   arrow?: boolean;
   className?: string;
-  variant?: "cream" | "yellow";
+  variant?: "cream" | "yellow" | "dark";
 };
 
 type LinkProps = BaseProps &
@@ -26,6 +26,7 @@ const BASE_CLASSES =
 const VARIANT_CLASSES = {
   cream: "bg-brand-cream text-brand-dark hover:bg-brand-dark hover:text-brand-cream",
   yellow: "bg-brand-yellow text-brand-dark hover:bg-brand-dark hover:text-brand-yellow",
+  dark: "bg-brand-dark text-brand-cream hover:bg-brand-dark hover:text-brand-cream",
 };
 
 function ArrowIcon() {

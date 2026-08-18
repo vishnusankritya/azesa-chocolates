@@ -33,7 +33,7 @@ export default function B2bTeaser() {
               </span>
             </div>
 
-            <Button href="/for-business" variant="yellow">Partner With Us</Button>
+            <Button href="/for-business">Partner With Us</Button>
           </div>
 
           <div className="flex flex-col gap-4">

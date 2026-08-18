@@ -1,6 +1,9 @@
+"use client";
+
 import Link from "next/link";
 import { products } from "@/data/products";
 import Button from "@/components/ui/Button";
+import AddToCartButton from "@/components/AddToCartButton";
 
 export default function BestsellerCarousel() {
   return (
@@ -22,7 +25,7 @@ export default function BestsellerCarousel() {
         </div>
 
         <div className="flex flex-wrap justify-center gap-6 md:gap-8 pb-4">
-          {products.map((product, i) => (
+          {products.filter((p) => p.image && p.type !== "hamper").map((product, i) => (
             <div
               key={product.id}
               className="relative flex-shrink-0 group"
@@ -30,13 +33,20 @@ export default function BestsellerCarousel() {
             >
               <Link href={`/shop/${product.id}`} className="block cursor-pointer">
                 <div
-                  className="w-full rounded-2xl mb-2 overflow-hidden transition-transform duration-200 group-hover:scale-110"
-                  style={{
-                    height: 140,
-                    border: i === 1 ? `3px solid ${product.accentColor}` : "2px solid #1c110915",
-                    backgroundColor: "#f5f0e8",
-                  }}
-                >
+                                  className="w-full rounded-2xl mb-2 overflow-hidden"
+                                  style={{
+                                    height: 140,
+                                    border: i === 1 ? `3px solid ${product.accentColor}` : "2px solid #1c110915",
+                                    backgroundColor: "#ffffff",
+                                  }}
+                                >
+                                  {product.image ? (
+                                    <img
+                                      src={product.image}
+                                      alt={product.name}
+                                      className="w-full h-full object-contain p-1 transition-transform duration-200 group-hover:scale-110"
+                                    />
+                                  ) : (
                   <div
                     className="w-full h-full flex flex-col items-center justify-center"
                     style={{ backgroundColor: product.accentColor + "20" }}
@@ -50,6 +60,7 @@ export default function BestsellerCarousel() {
                       </span>
                     </div>
                   </div>
+                  )}
                 </div>
                 <p className="font-heading text-brand-dark uppercase tracking-wide leading-tight" style={{ fontSize: 13 }}>
                   {product.name}
@@ -57,12 +68,12 @@ export default function BestsellerCarousel() {
                 <p className="text-brand-dark/40 text-sm mt-0.5">₹{product.price}</p>
               </Link>
 
-              <button
-                type="button"
-                className="absolute left-1/2 -translate-x-1/2 bottom-[52px] z-10 px-3 py-1.5 rounded-full border-2 border-brand-dark bg-brand-yellow text-brand-dark font-heading text-[10px] uppercase tracking-wide shadow-[2px_2px_0_0_#1c1109] whitespace-nowrap opacity-0 translate-y-1 pointer-events-none transition-all duration-200 group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto"
-              >
-                Add to Cart
-              </button>
+              <AddToCartButton
+                              id={product.id}
+                              label="Add to Cart"
+                              compact
+                              className="absolute left-1/2 -translate-x-1/2 bottom-[52px] z-10 whitespace-nowrap opacity-0 translate-y-1 pointer-events-none transition-all duration-200 group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto"
+                            />
             </div>
           ))}
         </div>

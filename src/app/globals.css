@@ -34,6 +34,12 @@ body {
   animation: jitter 1.6s ease-in-out infinite;
 }
 
+/* Hover on jittering collage cards: stop the animation, straighten the tilt. */
+.hover-stop:hover {
+  animation: none !important;
+  --base-rot: 0deg !important;
+}
+
 @keyframes jitter {
   0%,
   100% {
@@ -50,5 +56,48 @@ body {
   }
   80% {
     transform: translate(0.5px, 0.75px) rotate(calc(var(--base-rot, 0deg) + 0.75deg));
+  }
+}
+
+/* ---- Rakhi section animations ---- */
+.animate-float {
+  animation: float 5.5s ease-in-out infinite;
+}
+
+.animate-float-slow {
+  animation: float 7.5s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-12px);
+  }
+}
+
+.animate-twinkle {
+  animation: twinkle 2.2s ease-in-out infinite;
+}
+
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: scale(0.85);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-float,
+  .animate-float-slow,
+  .animate-twinkle {
+    animation: none !important;
   }
 }

@@ -1,16 +1,29 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { featuredProduct } from "@/data/products";
+import Link from "next/link";
 import Button from "@/components/ui/Button";
 
-export default function FeaturedSpotlight() {
-  const p = featuredProduct;
-  const words = p.name.split(" ");
-  const firstWord = words[0];
-  const restWords = words.slice(1).join(" ");
-  const tagline = p.tagline.replace(/\.$/, "");
+/* Piñata spotlight — title + tagline, three filling/product images in the
+   left, right and centre placeholders. */
+const SPOTLIGHT = {
+  word1: "Piñata",
+  word2: "Kunafa",
+  tagline: "Biscoff Piñata · Kataifa Kunafa · Cookie Piñata",
+  images: [
+    { id: "biscoff", src: "/products/biscoff.png", label: "Biscoff Piñata", rot: "-7deg" },
+    { id: "kunafa-pinata", src: "/products/kunafa-pinata.png", label: "Kataifa Kunafa", rot: "6deg" },
+    { id: "cookie-pinata", src: "/products/cookie-pinata.png", label: "Cookie Piñata", rot: "-2deg" },
+  ],
+};
 
+/* Hover: pause the jitter animation + straighten the tilt (on the card div),
+   and enlarge just the product image + silhouette shadow (on the <img>). */
+const CARD_HOVER = "transition-all duration-300 hover-stop hover:z-30";
+const IMG_HOVER =
+  "h-full w-full object-contain transition-transform duration-300 hover:scale-110 hover:drop-shadow-2xl";
+
+export default function FeaturedSpotlight() {
   const sectionRef = useRef<HTMLElement>(null);
   const [inView, setInView] = useState(false);
 
@@ -27,144 +40,137 @@ export default function FeaturedSpotlight() {
   }, []);
 
   const jitterClass = (base: string) => `tilt ${inView ? "jitter" : ""} ${base}`;
+  const [left, right, centre] = SPOTLIGHT.images;
 
   return (
-    <section ref={sectionRef} className="py-16 md:pt-20 md:pb-8 bg-brand-cream overflow-hidden">
-      <div className="max-w-6xl mx-auto px-6">
-
+    <section ref={sectionRef} className="bg-brand-cream overflow-hidden py-16 md:pb-8 md:pt-20">
+      <div className="mx-auto max-w-6xl px-6">
         {/* Mobile: simple stacked layout */}
-        <div className="md:hidden flex flex-col items-center text-center">
+        <div className="flex flex-col items-center text-center md:hidden">
           <h2
             className={jitterClass("font-heading text-brand-dark leading-[0.9]")}
             style={{ fontSize: "clamp(40px, 12vw, 64px)" }}
           >
-            {firstWord}
+            {SPOTLIGHT.word1}
             <br />
-            {restWords}
+            {SPOTLIGHT.word2}
           </h2>
 
           <span
             className="font-sans font-extrabold text-brand-dark/70 uppercase tracking-wide mt-2"
             style={{ fontSize: "clamp(18px, 5vw, 24px)" }}
           >
-            {tagline}
+            {SPOTLIGHT.tagline}
           </span>
 
-          <div
-            className={jitterClass("rounded-2xl mt-6 shadow-xl flex items-center justify-center")}
-            style={{ width: 220, height: 240, backgroundColor: "#1c1109" }}
-          >
-            <div className="flex flex-col items-center">
-              <span className="font-heading text-brand-yellow text-2xl">Azesa</span>
-              <span className="text-white/50 text-[10px] uppercase tracking-widest mt-1">{p.name}</span>
-            </div>
+          <div className={jitterClass("mt-6")} style={{ width: 220, height: 240 }}>
+            <Link href={`/shop/${centre.id}`} className="block h-full w-full">
+              <img src={centre.src} alt={centre.label} className={IMG_HOVER} />
+            </Link>
           </div>
 
           <div className="mt-4">
-            <Button href={`/shop/${p.id}`}>Try It</Button>
+            <Button href="/shop?category=pinata">Try It</Button>
           </div>
 
-          <div
-            className="flex items-center gap-2 mt-6"
-            style={{ transform: "rotate(-3deg)" }}
-          >
-            <span aria-hidden>🧂</span>
+          <div className="mt-6 flex items-center gap-2" style={{ transform: "rotate(-3deg)" }}>
             <span className="font-heading text-brand-dark text-sm uppercase tracking-widest whitespace-nowrap">
-              With {p.ingredient}
+              {SPOTLIGHT.tagline}
             </span>
           </div>
         </div>
 
         {/* Desktop: photo-collage layout */}
-        <div className="hidden md:block relative" style={{ minHeight: 600 }}>
+        <div className="relative hidden md:block" style={{ minHeight: 650 }}>
+          {/* Left photo — Biscoff Piñata (no container box) */}
+          <Link href={`/shop/${left.id}`} className="absolute block" style={{ top: 26, left: 0, width: 220, height: 220 }}>
+            <div
+              className={jitterClass(`flex h-full w-full items-center justify-center ${CARD_HOVER}`)}
+              style={{ ["--base-rot" as string]: left.rot }}
+            >
+              <img src={left.src} alt={left.label} className={IMG_HOVER} />
+            </div>
+          </Link>
 
-          {/* Left photo card */}
-          <div
-            className={jitterClass("absolute rounded-2xl shadow-xl flex items-center justify-center")}
-            style={{
-              top: 14, left: 0, width: 176, height: 176,
-              backgroundColor: "#ff7a0020",
-              border: "2px solid #ff7a0040",
-              ["--base-rot" as string]: "-7deg",
-            }}
-          >
-            <span style={{ fontSize: 60 }} aria-hidden>🧂</span>
-          </div>
-
-          {/* Ingredient callout under the left card */}
-          <div
-            className="absolute flex items-center gap-2"
-            style={{ top: 208, left: 0, transform: "rotate(-4deg)" }}
-          >
-            <span aria-hidden style={{ fontSize: 18 }}>🧂</span>
-            <span className="font-heading text-brand-dark text-sm uppercase tracking-widest whitespace-nowrap">
-              With {p.ingredient}
+          {/* Flavour label under the left card */}
+          <div className="pointer-events-none absolute flex justify-center" style={{ top: 254, left: 0, width: 220 }}>
+            <span
+              className="font-heading text-brand-dark text-sm uppercase tracking-widest whitespace-nowrap"
+              style={{ transform: "rotate(-4deg)" }}
+            >
+              {left.label}
             </span>
           </div>
 
-          {/* Right photo card, bleeding past the edge */}
-          <div
-            className={jitterClass("absolute rounded-2xl shadow-xl flex items-center justify-center")}
-            style={{
-              top: 40, right: -20, width: 176, height: 176,
-              backgroundColor: p.accentColor + "20",
-              border: `2px solid ${p.accentColor}40`,
-              ["--base-rot" as string]: "6deg",
-            }}
-          >
+          {/* Right photo — Kataifa Kunafa (no container box) */}
+          <Link href={`/shop/${right.id}`} className="absolute block" style={{ top: 46, right: -20, width: 220, height: 220 }}>
             <div
-              className="rounded-xl flex flex-col items-center justify-center"
-              style={{ backgroundColor: p.accentColor, width: 112, height: 112 }}
+              className={jitterClass(`flex h-full w-full items-center justify-center ${CARD_HOVER}`)}
+              style={{ ["--base-rot" as string]: right.rot }}
             >
-              <span className="font-heading text-white text-sm">Azesa</span>
+              <img src={right.src} alt={right.label} className={IMG_HOVER} />
             </div>
+          </Link>
+
+          {/* Flavour label under the right card */}
+          <div className="pointer-events-none absolute flex justify-center" style={{ top: 288, right: -20, width: 220 }}>
+            <span
+              className="font-heading text-brand-dark text-sm uppercase tracking-widest whitespace-nowrap"
+              style={{ transform: "rotate(4deg)" }}
+            >
+              {right.label}
+            </span>
           </div>
 
           {/* Heading */}
-          <div
-            className={jitterClass("absolute left-1/2 -translate-x-1/2 top-0 w-full text-center z-20")}
-          >
+          <div className={jitterClass("pointer-events-none absolute left-1/2 top-0 z-20 w-full -translate-x-1/2 text-center")}>
             <h2
-              className="font-heading text-brand-dark leading-[0.88] relative inline-block"
-              style={{ fontSize: "clamp(46px, 5.5vw, 76px)" }}
+              className="font-heading relative inline-block text-brand-dark leading-[0.88]"
+              style={{ fontSize: "clamp(46px, 5.4vw, 78px)" }}
             >
-              {firstWord}
-              <span className="absolute select-none" style={{ top: -18, right: -46, fontSize: 32 }} aria-hidden>
-                🧂
-              </span>
+              {SPOTLIGHT.word1}
             </h2>
-            <div className="flex items-center justify-center gap-3 -mt-1">
-              <span style={{ fontSize: 26 }} aria-hidden>💜</span>
+            <div className="-mt-1 flex items-center justify-center gap-3">
+              <span style={{ fontSize: 26 }} aria-hidden>
+                💜
+              </span>
               <h2
                 className="font-heading text-brand-dark leading-[0.88]"
-                style={{ fontSize: "clamp(46px, 5.5vw, 76px)" }}
+                style={{ fontSize: "clamp(46px, 5.4vw, 78px)" }}
               >
-                {restWords}
+                {SPOTLIGHT.word2}
               </h2>
             </div>
             <span
-              className="block font-sans font-extrabold text-brand-dark/70 uppercase tracking-wide mt-3"
-              style={{ fontSize: "clamp(20px, 2.6vw, 30px)" }}
+              className="mt-2 block font-sans font-extrabold text-brand-dark/70 uppercase tracking-wide"
+              style={{ fontSize: "clamp(15px, 1.9vw, 23px)" }}
             >
-              {tagline}
+              {SPOTLIGHT.tagline}
             </span>
           </div>
 
-          {/* Main product photo */}
-          <div
-            className={jitterClass("absolute left-1/2 -translate-x-1/2 rounded-2xl shadow-2xl flex items-center justify-center z-10")}
-            style={{
-              top: 258, width: 260, height: 250,
-              backgroundColor: "#1c1109",
-              ["--base-rot" as string]: "-2deg",
-            }}
+          {/* Main product photo — Cookie Piñata (no container box, same size as sides) */}
+          <Link
+            href={`/shop/${centre.id}`}
+            className="absolute left-1/2 top-[268px] z-10 block w-[220px] -translate-x-1/2"
+            style={{ height: 220 }}
           >
-            <div className="flex flex-col items-center">
-              <span className="font-heading text-brand-yellow leading-none" style={{ fontSize: 32 }}>
-                Azesa
-              </span>
-              <span className="text-white/50 text-[11px] uppercase tracking-widest mt-2">{p.name}</span>
+            <div
+              className={jitterClass(`flex h-full w-full items-center justify-center ${CARD_HOVER}`)}
+              style={{ ["--base-rot" as string]: centre.rot }}
+            >
+              <img src={centre.src} alt={centre.label} className={IMG_HOVER} />
             </div>
+          </Link>
+
+          {/* Flavour label under the centre card */}
+          <div className="pointer-events-none absolute left-0 right-0 flex justify-center" style={{ top: 496 }}>
+            <span
+              className="font-heading text-brand-dark text-sm uppercase tracking-widest whitespace-nowrap"
+              style={{ transform: "rotate(-2deg)" }}
+            >
+              {centre.label}
+            </span>
           </div>
 
           {/* Sparkle dashes */}
@@ -173,8 +179,8 @@ export default function FeaturedSpotlight() {
           <SpotlightDash style={{ top: 40, left: 210, transform: "rotate(50deg)", opacity: 0.35 }} />
 
           {/* CTA */}
-          <div className="absolute left-1/2 -translate-x-1/2" style={{ top: 542 }}>
-            <Button href={`/shop/${p.id}`}>Try It</Button>
+          <div className="absolute left-1/2 -translate-x-1/2" style={{ top: 566 }}>
+            <Button href="/shop?category=pinata">Try It</Button>
           </div>
         </div>
       </div>
@@ -185,7 +191,7 @@ export default function FeaturedSpotlight() {
 function SpotlightDash({ style }: { style: React.CSSProperties }) {
   return (
     <div
-      className="absolute w-6 h-2 rounded-full"
+      className="pointer-events-none absolute h-2 w-6 rounded-full"
       style={{ backgroundColor: "#1c1109", ...style }}
       aria-hidden
     />

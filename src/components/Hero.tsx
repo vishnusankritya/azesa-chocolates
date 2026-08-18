@@ -3,7 +3,7 @@ import Button from "@/components/ui/Button";
 export default function Hero() {
   return (
     <section
-      className="relative overflow-hidden rounded-2xl"
+      className="relative overflow-hidden rounded-t-2xl rounded-b-none"
       style={{ backgroundColor: "#ff7a00", minHeight: 500, maxHeight: "calc(100vh - 110px)" }}
     >
       {/* Yellow right-side diagonal panel */}
@@ -46,24 +46,25 @@ export default function Hero() {
           </div>
         </div>
 
-        {/* Right: Product placeholder */}
-        <div className="relative flex items-center justify-center py-4">
+        {/* Right: Product placeholder — cream card with products overflowing (per UI reference) */}
+        <div className="relative flex items-center justify-center py-8">
           <div
-            className="rounded-2xl flex flex-col items-center justify-center shadow-2xl relative"
-            style={{ width: 240, height: 240, backgroundColor: "#1c1109" }}
+            className="relative overflow-visible rounded-[2rem] border-2 border-brand-dark shadow-[10px_10px_0_0_#1c1109]"
+            style={{ width: 336, height: 260, backgroundColor: "#f5f0e6" }}
           >
-            <span
-              className="font-heading text-brand-yellow leading-none mb-2"
-              style={{ fontSize: 42 }}
-            >
-              Azesa
-            </span>
-            <span className="text-white/40 text-xs uppercase tracking-[0.15em]">
-              Chocolates
-            </span>
+            {/* Hamper enlarged so it spills out past the card edges — jitter + hover enlarge (item only) */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="tilt jitter" style={{ ["--base-rot" as string]: "1.5deg" }}>
+                <img
+                  src="/rakhi-hamper.png"
+                  alt="Azesa Happy Rakhi Hamper"
+                  className="h-[460px] w-[460px] object-contain transition-transform duration-300 hover:scale-110"
+                />
+              </div>
+            </div>
 
             <div
-              className="absolute -bottom-6 -right-6 w-[76px] h-[76px] rounded-full flex flex-col items-center justify-center text-center"
+              className="absolute -bottom-6 -right-6 w-[76px] h-[76px] rounded-full flex flex-col items-center justify-center text-center z-10"
               style={{ backgroundColor: "#ff7a00", border: "3px solid #ffd000" }}
             >
               <span className="font-heading text-white text-[10px] leading-tight">Made in</span>
