@@ -1,10 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import type { Product } from "@/data/products";
+import type { CatalogProduct } from "@/lib/catalog";
 import AddToCartButton from "@/components/AddToCartButton";
 
-export default function ProductCard({ product }: { product: Product }) {
+export default function ProductCard({ product }: { product: CatalogProduct }) {
   return (
     <div className="group flex flex-col rounded-2xl border-2 border-brand-dark bg-[#fbf7ee] p-2.5 transition-transform duration-200 hover:scale-[1.04] hover:shadow-[5px_5px_0_0_#1c1109]">
       <Link href={`/shop/${product.id}`} className="flex flex-col">

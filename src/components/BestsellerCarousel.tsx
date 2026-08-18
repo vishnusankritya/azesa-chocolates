@@ -1,11 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { products } from "@/data/products";
+import type { CatalogProduct } from "@/lib/catalog";
 import Button from "@/components/ui/Button";
 import AddToCartButton from "@/components/AddToCartButton";
 
-export default function BestsellerCarousel() {
+export default function BestsellerCarousel({ products }: { products: CatalogProduct[] }) {
   return (
     <section className="pt-2 pb-8 bg-brand-cream">
       <div className="max-w-7xl mx-auto px-6">

@@ -12,8 +12,11 @@ import OccasionsSection from "@/components/OccasionsSection";
 import B2bTeaser from "@/components/B2bTeaser";
 import ReviewsSection from "@/components/ReviewsSection";
 import Footer from "@/components/Footer";
+import { getProducts } from "@/server/catalog";
 
-export default function Home() {
+export default async function Home() {
+  const products = await getProducts();
+
   return (
     <>
       <div className="bg-brand-cream p-2 md:p-3">
@@ -27,10 +30,10 @@ export default function Home() {
         </div>
       </div>
       <main>
-        <BestsellerCarousel />
+        <BestsellerCarousel products={products} />
         <UspBar />
         <FeaturedSpotlight />
-        <ProductsGrid />
+        <ProductsGrid products={products} />
         <CategoriesSection />
         <BrandStoryTeaser />
         <OccasionsSection />

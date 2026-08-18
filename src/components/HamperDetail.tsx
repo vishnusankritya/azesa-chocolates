@@ -1,13 +1,15 @@
 import Link from "next/link";
-import { products, type Product } from "@/data/products";
+import type { CatalogProduct } from "@/lib/catalog";
 import AddToCartButton from "@/components/AddToCartButton";
 import ProductCard from "@/components/ProductCard";
 
-export default function HamperDetail({ product }: { product: Product }) {
-  const related = [
-    ...products.filter((p) => p.id !== product.id && p.type === "hamper"),
-    ...products.filter((p) => p.id !== product.id && p.type !== "hamper"),
-  ].slice(0, 4);
+export default function HamperDetail({
+  product,
+  related,
+}: {
+  product: CatalogProduct;
+  related: CatalogProduct[];
+}) {
 
   return (
     <section className="bg-white py-12 md:py-16">

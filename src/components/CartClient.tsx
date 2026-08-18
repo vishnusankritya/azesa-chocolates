@@ -3,12 +3,13 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useCart } from "@/context/CartContext";
-import { products } from "@/data/products";
+import { useProducts } from "@/lib/useProducts";
 import QtyStepper from "@/components/QtyStepper";
 import Button from "@/components/ui/Button";
 
 export default function CartClient() {
   const { items, count, subtotal, add, setQty, remove, clear } = useCart();
+  const products = useProducts();
 
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [placed, setPlaced] = useState(false);

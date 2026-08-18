@@ -9,7 +9,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { products } from "@/data/products";
+import { useProducts } from "@/lib/useProducts";
 
 export interface CartItem {
   id: string;
@@ -32,6 +32,7 @@ const STORAGE_KEY = "azesa-cart";
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [mounted, setMounted] = useState(false);
+  const catalog = useProducts();
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -82,10 +83,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const subtotal = useMemo(
     () =>
       items.reduce(
-        (sum, i) => sum + (products.find((p) => p.id === i.id)?.price ?? 0) * i.qty,
+        (sum, i) => sum + (catalog.find((p) => p.id === i.id)?.price ?? 0) * i.qty,
         0
       ),
-    [items]
+    [items, catalog]
   );
 
   const clear = useCallback(() => setItems([]), []);
