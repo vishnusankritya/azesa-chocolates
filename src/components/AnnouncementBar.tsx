@@ -37,7 +37,7 @@ export default function AnnouncementBar() {
 
   return (
     <div
-      className="w-full rounded-2xl grid grid-cols-[auto_1fr_auto] items-center gap-4 px-5 py-2.5 text-white"
+      className="w-full overflow-hidden rounded-2xl grid grid-cols-[auto_1fr_auto] items-center gap-4 px-5 py-2.5 text-white"
       style={{ backgroundColor: "#1c1109" }}
     >
       <div className="hidden sm:flex items-center gap-2 text-white text-[11px] font-semibold uppercase tracking-widest whitespace-nowrap">
@@ -46,9 +46,10 @@ export default function AnnouncementBar() {
       </div>
 
       <span
-        className="text-center text-xs font-bold uppercase tracking-widest whitespace-nowrap"
+        className="text-center text-xs font-bold uppercase tracking-widest"
         style={{
           display: "inline-block",
+          maxWidth: "100%",
           opacity: visible ? 1 : 0,
           transition: "opacity 0.3s ease",
         }}

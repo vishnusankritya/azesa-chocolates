@@ -27,7 +27,7 @@ export default function AddToCartButton({
         <button
           type="button"
           onClick={() => add(id)}
-          className={`${container} px-3 py-1.5 text-brand-dark hover:bg-brand-dark hover:text-brand-cream`}
+          className={`${container} cursor-pointer px-3 py-1.5 text-brand-dark hover:bg-brand-dark hover:text-brand-cream`}
         >
           {label}
         </button>
@@ -41,7 +41,7 @@ export default function AddToCartButton({
           type="button"
           aria-label="Increase quantity"
           onClick={() => add(id)}
-          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-2 border-brand-dark bg-brand-cream text-base font-black leading-none text-brand-dark shadow-[2px_2px_0_0_#1c1109] transition-colors hover:bg-brand-dark hover:text-brand-cream"
+          className="flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-full border-2 border-brand-dark bg-brand-cream text-base font-black leading-none text-brand-dark shadow-[2px_2px_0_0_#1c1109] transition-colors hover:bg-brand-dark hover:text-brand-cream"
         >
           +
         </button>

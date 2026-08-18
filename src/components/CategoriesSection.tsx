@@ -73,11 +73,11 @@ function StarShape({ bg, img, alt }: { bg: string; img: string; alt: string }) {
     pts.push(`${(50 + r * Math.cos(a)).toFixed(2)},${(50 + r * Math.sin(a)).toFixed(2)}`);
   }
   return (
-    <div className="relative h-[176px] w-[176px]">
-          <svg viewBox="0 0 100 100" className="h-full w-full drop-shadow-[3px_3px_0_#1c1109]">
-            <polygon points={pts.join(" ")} fill={bg} stroke="#1c1109" strokeWidth="4" strokeLinejoin="round" />
-          </svg>
-          <div className="absolute inset-0 flex items-center justify-center p-6">
+    <div className="relative h-[120px] w-[120px] md:h-[176px] md:w-[176px]">
+      <svg viewBox="0 0 100 100" className="h-full w-full drop-shadow-[3px_3px_0_#1c1109]">
+        <polygon points={pts.join(" ")} fill={bg} stroke="#1c1109" strokeWidth="4" strokeLinejoin="round" />
+      </svg>
+      <div className="absolute inset-0 flex items-center justify-center p-4 md:p-6">
             <img
               src={img}
               alt={alt}
@@ -108,10 +108,10 @@ function ShapeTile({ c }: { c: (typeof categories)[number] }) {
 
   return (
       <div
-        className={`relative h-[176px] w-[176px] overflow-hidden border-4 border-brand-dark ${shapeClass} shadow-[5px_5px_0_0_#1c1109]`}
+        className={`relative h-[120px] w-[120px] overflow-hidden border-4 border-brand-dark md:h-[176px] md:w-[176px] ${shapeClass} shadow-[5px_5px_0_0_#1c1109]`}
         style={style}
       >
-        <div className="absolute inset-0 flex items-center justify-center p-6">
+        <div className="absolute inset-0 flex items-center justify-center p-4 md:p-6">
                 <img
                   src={c.img}
                   alt={c.label}

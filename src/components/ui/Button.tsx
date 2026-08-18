@@ -21,7 +21,7 @@ type ButtonElementProps = BaseProps &
 type Props = LinkProps | ButtonElementProps;
 
 const BASE_CLASSES =
-  "inline-flex items-center gap-1.5 px-5 py-2 rounded-full border-2 border-brand-dark font-heading text-sm uppercase tracking-wide shadow-[3px_3px_0_0_#1c1109] transition-all duration-150 hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none flex-shrink-0";
+  "inline-flex items-center gap-1.5 px-5 py-2 rounded-full border-2 border-brand-dark font-heading text-sm uppercase tracking-wide shadow-[3px_3px_0_0_#1c1109] transition-all duration-150 hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none flex-shrink-0 cursor-pointer";
 
 const VARIANT_CLASSES = {
   cream: "bg-brand-cream text-brand-dark hover:bg-brand-dark hover:text-brand-cream",

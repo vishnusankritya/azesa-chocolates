@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { useCart } from "@/context/CartContext";
 import { products } from "@/data/products";
@@ -7,7 +8,39 @@ import QtyStepper from "@/components/QtyStepper";
 import Button from "@/components/ui/Button";
 
 export default function CartClient() {
-  const { items, count, subtotal, add, setQty, remove } = useCart();
+  const { items, count, subtotal, add, setQty, remove, clear } = useCart();
+
+  const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const [placed, setPlaced] = useState(false);
+  const [form, setForm] = useState({
+    name: "",
+    phone: "",
+    email: "",
+    address: "",
+    city: "",
+    state: "",
+    pincode: "",
+    payment: "upi" as "upi" | "card" | "cod",
+    upiId: "",
+    cardNumber: "",
+    cardExpiry: "",
+    cardCvv: "",
+  });
+
+  const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) =>
+    setForm((f) => ({ ...f, [k]: e.target.value }));
+
+  const handlePlaceOrder = (e: React.FormEvent) => {
+    e.preventDefault();
+    setPlaced(true);
+  };
+
+  const handleDone = () => {
+    setCheckoutOpen(false);
+    setPlaced(false);
+    setForm((f) => ({ ...f, name: "", phone: "", email: "", address: "", city: "", state: "", pincode: "" }));
+    clear();
+  };
 
   const rows = items.flatMap((item) => {
     const product = products.find((p) => p.id === item.id);
@@ -106,7 +139,7 @@ export default function CartClient() {
                     type="button"
                     aria-label={`Remove ${product.name} from cart`}
                     onClick={() => remove(item.id)}
-                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 border-brand-dark text-xl leading-none text-brand-dark transition-colors hover:bg-brand-dark hover:text-brand-cream"
+                    className="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-full border-2 border-brand-dark text-xl leading-none text-brand-dark transition-colors hover:bg-brand-dark hover:text-brand-cream"
                   >
                     ×
                   </button>
@@ -139,7 +172,9 @@ export default function CartClient() {
                 <span className="font-heading text-brand-dark">₹{subtotal}</span>
               </div>
             </div>
-            <Button className="mt-6 w-full justify-center">Checkout</Button>
+            <Button className="mt-6 w-full justify-center" onClick={() => setCheckoutOpen(true)}>
+              Checkout · ₹{subtotal}
+            </Button>
             <p className="mt-3 flex items-center gap-1.5 text-xs font-semibold text-brand-dark/50">
               <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-brand-orange" />
               Free shipping on all orders
@@ -147,6 +182,141 @@ export default function CartClient() {
           </div>
         </div>
       </div>
+
+      {checkoutOpen && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="checkout-title"
+          className="fixed inset-0 z-[120] grid place-items-center overflow-y-auto bg-[#1c1109]/60 p-4 backdrop-blur-sm"
+          onMouseDown={(event) => event.target === event.currentTarget && !placed && setCheckoutOpen(false)}
+        >
+          <div className="w-full max-w-lg rounded-3xl border-2 border-brand-dark bg-brand-cream p-7 shadow-[6px_6px_0_0_#1c1109] md:p-9">
+            {placed ? (
+              <div className="text-center">
+                <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full border-2 border-brand-dark bg-brand-yellow">
+                  <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#1c1109" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M20 6 9 17l-5-5" />
+                  </svg>
+                </div>
+                <h2 className="mt-6 font-heading text-3xl font-black text-brand-dark">Order placed!</h2>
+                <p className="mt-3 text-brand-dark/70">
+                  Thank you, {form.name || "chocolate lover"}. A confirmation has been sent to{" "}
+                  <span className="font-semibold text-brand-dark">{form.phone || form.email || "your contact"}</span>.
+                  <br />
+                  We&apos;ll deliver {count} {count === 1 ? "item" : "items"} to {form.address || "your address"}{" "}
+                  {form.city ? `, ${form.city}` : ""}.
+                </p>
+                <div className="mt-6 rounded-2xl border border-brand-dark/15 bg-white p-4 text-left">
+                  <div className="flex justify-between text-brand-dark/70"><span>Total paid</span><span className="font-heading text-brand-dark">₹{subtotal}</span></div>
+                  <div className="mt-1 flex justify-between text-brand-dark/70"><span>Payment</span><span className="font-heading uppercase text-brand-dark">{form.payment === "cod" ? "Cash on Delivery" : form.payment === "card" ? "Card" : "UPI"}</span></div>
+                </div>
+                <Button className="mt-7 w-full justify-center" onClick={handleDone}>
+                  Done
+                </Button>
+              </div>
+            ) : (
+              <>
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="font-heading text-sm font-black uppercase tracking-[0.15em] text-[#f47920]">Secure checkout</p>
+                    <h2 id="checkout-title" className="mt-1 font-heading text-2xl font-black text-brand-dark md:text-3xl">
+                      Almost there
+                    </h2>
+                  </div>
+                  <button
+                    type="button"
+                    aria-label="Close checkout"
+                    onClick={() => setCheckoutOpen(false)}
+                    className="cursor-pointer rounded-full border-2 border-brand-dark px-2.5 text-xl leading-none text-brand-dark transition-colors hover:bg-brand-dark hover:text-brand-cream"
+                  >
+                    ×
+                  </button>
+                </div>
+
+                <form onSubmit={handlePlaceOrder} className="mt-6 space-y-5">
+                  <fieldset className="space-y-3">
+                    <legend className="mb-1 font-heading text-sm font-black uppercase tracking-wide text-brand-dark">Contact</legend>
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      <input required value={form.name} onChange={set("name")} placeholder="Full name" className="input" />
+                      <input required value={form.phone} onChange={set("phone")} type="tel" placeholder="Phone" className="input" />
+                    </div>
+                    <input value={form.email} onChange={set("email")} type="email" placeholder="Email (optional)" className="input" />
+                  </fieldset>
+
+                  <fieldset className="space-y-3">
+                    <legend className="mb-1 font-heading text-sm font-black uppercase tracking-wide text-brand-dark">Delivery address</legend>
+                    <input required value={form.address} onChange={set("address")} placeholder="Flat / house no., street, area" className="input" />
+                    <div className="grid gap-3 sm:grid-cols-3">
+                      <input required value={form.city} onChange={set("city")} placeholder="City" className="input" />
+                      <input required value={form.state} onChange={set("state")} placeholder="State" className="input" />
+                      <input required value={form.pincode} onChange={set("pincode")} inputMode="numeric" placeholder="PIN" className="input" />
+                    </div>
+                  </fieldset>
+
+                  <fieldset className="space-y-3">
+                    <legend className="mb-1 font-heading text-sm font-black uppercase tracking-wide text-brand-dark">Payment</legend>
+                    <div className="grid grid-cols-3 gap-2">
+                      {([
+                        ["upi", "UPI"],
+                        ["card", "Card"],
+                        ["cod", "Cash on Delivery"],
+                      ] as const).map(([val, label]) => (
+                        <button
+                          key={val}
+                          type="button"
+                          onClick={() => setForm((f) => ({ ...f, payment: val }))}
+                          className={`cursor-pointer rounded-xl border-2 px-3 py-2 font-heading text-xs font-black uppercase tracking-wide transition-colors ${
+                            form.payment === val
+                              ? "border-brand-dark bg-brand-dark text-brand-cream"
+                              : "border-brand-dark/25 bg-white text-brand-dark hover:border-brand-dark"
+                          }`}
+                        >
+                          {label}
+                        </button>
+                      ))}
+                    </div>
+
+                    {form.payment === "upi" && (
+                      <input value={form.upiId} onChange={set("upiId")} placeholder="UPI ID (e.g. name@upi)" className="input" />
+                    )}
+                    {form.payment === "card" && (
+                      <div className="space-y-3">
+                        <input value={form.cardNumber} onChange={set("cardNumber")} inputMode="numeric" placeholder="Card number" className="input" />
+                        <div className="grid grid-cols-2 gap-3">
+                          <input value={form.cardExpiry} onChange={set("cardExpiry")} placeholder="MM / YY" className="input" />
+                          <input value={form.cardCvv} onChange={set("cardCvv")} inputMode="numeric" placeholder="CVV" className="input" />
+                        </div>
+                      </div>
+                    )}
+                    {form.payment === "cod" && (
+                      <p className="rounded-xl bg-white px-3 py-2 text-sm text-brand-dark/70">
+                        Pay ₹{subtotal} when your order arrives. Small convenience fee may apply.
+                      </p>
+                    )}
+                  </fieldset>
+
+                  <div className="my-4 h-px bg-brand-dark/15" />
+                  <div className="flex items-center justify-between">
+                    <span className="font-heading text-brand-dark">Total</span>
+                    <span className="font-heading text-2xl font-black text-brand-dark">₹{subtotal}</span>
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="mt-4 w-full cursor-pointer rounded-full border-2 border-brand-dark bg-brand-cream px-6 py-3.5 font-heading text-base font-black uppercase tracking-wide text-brand-dark shadow-[3px_3px_0_0_#1c1109] transition-all duration-150 hover:translate-x-[3px] hover:translate-y-[3px] hover:bg-brand-dark hover:text-brand-cream hover:shadow-none"
+                  >
+                    Place order · ₹{subtotal}
+                  </button>
+                  <p className="text-center text-[11px] font-semibold text-brand-dark/45">
+                    Demo checkout — connect a payment gateway to go live. Nothing is charged.
+                  </p>
+                </form>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </section>
   );
 }

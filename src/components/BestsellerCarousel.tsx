@@ -24,18 +24,16 @@ export default function BestsellerCarousel() {
           </Button>
         </div>
 
-        <div className="flex flex-wrap justify-center gap-6 md:gap-8 pb-4">
+        <div className="flex snap-x snap-mandatory gap-3 overflow-x-auto pb-3 scroll-hide sm:gap-4 md:gap-5">
           {products.filter((p) => p.image && p.type !== "hamper").slice(0, 6).map((product) => (
             <div
               key={product.id}
-              className="relative flex-shrink-0 group"
-              style={{ width: 140 }}
+              className="relative group w-[40%] shrink-0 snap-start sm:w-[28%] md:w-[20%] lg:w-[14%]"
             >
               <Link href={`/shop/${product.id}`} className="block cursor-pointer">
                 <div
-                                  className="w-full rounded-2xl mb-2 overflow-hidden"
+                                  className="w-full aspect-square rounded-2xl mb-2 overflow-hidden"
                                   style={{
-                                    height: 140,
                                     border: "2px solid #1c110915",
                                     backgroundColor: "#ffffff",
                                   }}
@@ -44,7 +42,7 @@ export default function BestsellerCarousel() {
                                     <img
                                       src={product.image}
                                       alt={product.name}
-                                      className="w-full h-full object-contain p-1 transition-transform duration-200 group-hover:scale-110"
+                                      className="w-full h-full object-contain p-2 transition-transform duration-200 group-hover:scale-110 md:p-3"
                                     />
                                   ) : (
                   <div
@@ -62,7 +60,7 @@ export default function BestsellerCarousel() {
                   </div>
                   )}
                 </div>
-                <p className="font-heading text-brand-dark uppercase tracking-wide leading-tight" style={{ fontSize: 13 }}>
+                <p className="font-heading text-brand-dark uppercase tracking-wide leading-tight" style={{ fontSize: 14 }}>
                   {product.name}
                 </p>
                 <p className="text-brand-dark/40 text-sm mt-0.5">₹{product.price}</p>
@@ -72,7 +70,7 @@ export default function BestsellerCarousel() {
                               id={product.id}
                               label="Add to Cart"
                               compact
-                              className="absolute left-1/2 -translate-x-1/2 bottom-[52px] z-10 whitespace-nowrap opacity-0 translate-y-1 pointer-events-none transition-all duration-200 group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto"
+                              className="absolute left-1/2 -translate-x-1/2 bottom-[56px] z-10 whitespace-nowrap opacity-0 translate-y-1 pointer-events-none transition-all duration-200 group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto"
                             />
             </div>
           ))}

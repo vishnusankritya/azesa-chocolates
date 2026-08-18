@@ -58,7 +58,7 @@ export default function Hero() {
                 <img
                   src="/rakhi-hamper.png"
                   alt="Azesa Happy Rakhi Hamper"
-                  className="h-[460px] w-[460px] object-contain transition-transform duration-300 hover:scale-110"
+                  className="h-[460px] w-[460px] cursor-pointer object-contain transition-transform duration-300 hover:scale-110"
                 />
               </div>
             </div>
