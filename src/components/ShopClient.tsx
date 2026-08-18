@@ -5,7 +5,9 @@ import { products } from "@/data/products";
 import ProductCard from "@/components/ProductCard";
 import Button from "@/components/ui/Button";
 
-type Filter = "all" | "chocolate" | "cookie" | "pinata" | "hamper";
+const PAGE_SIZE = 8;
+
+type Filter = "all" | "chocolate" | "cookie" | "pinata" | "hamper" | "bestseller";
 
 const FILTERS: { id: Filter; label: string }[] = [
   { id: "all", label: "All" },
@@ -13,9 +15,12 @@ const FILTERS: { id: Filter; label: string }[] = [
   { id: "cookie", label: "Cookies" },
   { id: "pinata", label: "Piñata" },
   { id: "hamper", label: "Hampers" },
+  { id: "bestseller", label: "Bestsellers" },
 ];
 
 const PINATA_IDS = ["cookie-pinata", "biscoff", "kunafa-pinata"];
+
+const BESTSELLER_IDS = ["biscoff", "cookie-pinata", "mango", "choc-chip", "cookie-cream", "holi-edition-white"];
 
 export default function ShopClient({ initialCategory = "all" }: { initialCategory?: string }) {
   const [filter, setFilter] = useState<Filter>(
@@ -27,15 +32,27 @@ export default function ShopClient({ initialCategory = "all" }: { initialCategor
           ? "pinata"
           : initialCategory === "hampers"
             ? "hamper"
-            : "all"
+            : initialCategory === "bestsellers"
+              ? "bestseller"
+              : "all"
   );
+  const [page, setPage] = useState(1);
 
   const visible = useMemo(() => {
     if (filter === "all") return products;
+    if (filter === "bestseller") return products.filter((p) => BESTSELLER_IDS.includes(p.id));
     if (filter === "pinata") return products.filter((p) => PINATA_IDS.includes(p.id));
     if (filter === "hamper") return products.filter((p) => p.type === "hamper");
     return products.filter((p) => p.type === filter);
   }, [filter]);
+
+  const totalPages = useMemo(() => Math.max(1, Math.ceil(visible.length / PAGE_SIZE)), [visible]);
+  const pageItems = useMemo(() => visible.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE), [visible, page]);
+
+  const selectFilter = (f: Filter) => {
+    setFilter(f);
+    setPage(1);
+  };
 
   return (
     <section className="bg-white py-16 md:py-20">
@@ -64,7 +81,7 @@ export default function ShopClient({ initialCategory = "all" }: { initialCategor
               <Button
                 key={f.id}
                 arrow={false}
-                onClick={() => setFilter(f.id)}
+                onClick={() => selectFilter(f.id)}
                 variant={filter === f.id ? "dark" : "cream"}
                 className={filter === f.id ? "animate-float scale-110" : ""}
               >
@@ -75,10 +92,49 @@ export default function ShopClient({ initialCategory = "all" }: { initialCategor
         </div>
 
         <div className="grid grid-cols-2 gap-4 sm:gap-5 md:grid-cols-3 lg:grid-cols-4">
-          {visible.map((p) => (
+          {pageItems.map((p) => (
             <ProductCard key={p.id} product={p} />
           ))}
         </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="mt-12 flex items-center justify-center gap-2">
+            <button
+              type="button"
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page === 1}
+              aria-label="Previous page"
+              className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-brand-dark bg-brand-cream font-heading text-lg font-black text-brand-dark shadow-[2px_2px_0_0_#1c1109] transition-all hover:bg-brand-dark hover:text-brand-cream disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none"
+            >
+              −
+            </button>
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((n) => (
+              <button
+                key={n}
+                type="button"
+                onClick={() => setPage(n)}
+                aria-current={page === n ? "page" : undefined}
+                className={`flex h-10 min-w-10 items-center justify-center rounded-full border-2 border-brand-dark px-3 font-heading text-sm font-black uppercase tracking-wide transition-all ${
+                  page === n
+                    ? "bg-brand-dark text-brand-cream scale-110"
+                    : "bg-brand-cream text-brand-dark hover:bg-brand-dark hover:text-brand-cream"
+                }`}
+              >
+                {n}
+              </button>
+            ))}
+            <button
+              type="button"
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              disabled={page === totalPages}
+              aria-label="Next page"
+              className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-brand-dark bg-brand-cream font-heading text-lg font-black text-brand-dark shadow-[2px_2px_0_0_#1c1109] transition-all hover:bg-brand-dark hover:text-brand-cream disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none"
+            >
+              +
+            </button>
+          </div>
+        )}
       </div>
     </section>
   );

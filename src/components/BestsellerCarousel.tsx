@@ -25,7 +25,7 @@ export default function BestsellerCarousel() {
         </div>
 
         <div className="flex flex-wrap justify-center gap-6 md:gap-8 pb-4">
-          {products.filter((p) => p.image && p.type !== "hamper").map((product, i) => (
+          {products.filter((p) => p.image && p.type !== "hamper").slice(0, 6).map((product) => (
             <div
               key={product.id}
               className="relative flex-shrink-0 group"
@@ -36,7 +36,7 @@ export default function BestsellerCarousel() {
                                   className="w-full rounded-2xl mb-2 overflow-hidden"
                                   style={{
                                     height: 140,
-                                    border: i === 1 ? `3px solid ${product.accentColor}` : "2px solid #1c110915",
+                                    border: "2px solid #1c110915",
                                     backgroundColor: "#ffffff",
                                   }}
                                 >
