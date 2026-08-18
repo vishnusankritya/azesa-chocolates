@@ -6,6 +6,7 @@ import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
 import AddToCartButton from "@/components/AddToCartButton";
+import HamperDetail from "@/components/HamperDetail";
 
 export function generateStaticParams() {
   return products.map((p) => ({ id: p.id }));
@@ -26,6 +27,23 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
   const { id } = await params;
   const product = products.find((p) => p.id === id);
   if (!product) notFound();
+
+  if (product.type === "hamper") {
+    return (
+      <>
+        <div className="bg-brand-cream p-2 md:p-3">
+          <div className="flex flex-col gap-2 md:gap-3">
+            <AnnouncementBar />
+            <Nav />
+          </div>
+        </div>
+        <main>
+          <HamperDetail product={product} />
+        </main>
+        <Footer />
+      </>
+    );
+  }
 
   const related = [
     ...products.filter((p) => p.id !== product.id && p.type === product.type),

@@ -67,6 +67,9 @@ export default function AddToCartButton({
   }
 
   return (
-    <QtyStepper qty={item.qty} onDec={() => setQty(id, item.qty - 1)} onInc={() => add(id)} />
+    <div className="flex flex-wrap items-center gap-3">
+      <QtyStepper qty={item.qty} onDec={() => setQty(id, item.qty - 1)} onInc={() => add(id)} />
+      <Button href="/cart">Go to cart</Button>
+    </div>
   );
 }

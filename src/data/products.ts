@@ -7,6 +7,9 @@ export interface Product {
   ingredient: string;
   tagline: string;
   image?: string;
+  mrp?: number;
+  occasion?: string;
+  contents?: string[];
 }
 
 export const products: Product[] = [
@@ -154,20 +157,38 @@ export const products: Product[] = [
       id: "rakhi-chaos-hamper",
       name: "Ultimate Rakhi Chaos Hamper",
       price: 699,
+      mrp: 999,
       type: "hamper",
       accentColor: "#9a4600",
       ingredient: "Assorted Chocolates & Surprises",
       tagline: "Sibling chaos, boxed with love.",
       image: "/rakhi-hamper.png",
+      occasion:
+        "Raksha Bandhan — the festival of sibling love. A joy-filled hamper for that beautiful, wonderfully crazy bond between brothers and sisters.",
+      contents: [
+        "Happy Rakhi — rakhis & keychains for the sibling duo",
+        "Piñata chocolates: Biscoff & Cookie Piñata",
+        "Mango dark chocolate bar",
+        "Assorted handcrafted treats & surprises",
+      ],
     },
     {
       id: "romantic-teddy-hamper",
       name: "Romantic Teddy Gift Box",
       price: 999,
+      mrp: 1299,
       type: "hamper",
       accentColor: "#e11d48",
       ingredient: "Teddy, Chocolates & Love",
       tagline: "For the one you're sweet on.",
       image: "/products/romantic-teddy-hamper.png",
+      occasion:
+        "Valentine's Day, anniversaries & every sweet milestone — for the one you're head over heels for.",
+      contents: [
+        "Cuddly teddy gift box",
+        "Handcrafted Valentine's chocolates",
+        "Coffee & love-note surprises",
+        "Made with real ingredients, no shortcuts",
+      ],
     },
   ];
