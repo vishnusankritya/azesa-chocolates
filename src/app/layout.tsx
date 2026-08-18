@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Lilita_One, DM_Sans, Pacifico } from "next/font/google";
+import { CartProvider } from "@/context/CartContext";
 import "./globals.css";
 
 const lilitaOne = Lilita_One({
@@ -32,7 +33,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${lilitaOne.variable} ${dmSans.variable} ${pacifico.variable}`}>
-      <body className="font-sans antialiased">{children}</body>
+      <body className="font-sans antialiased">
+        <CartProvider>{children}</CartProvider>
+      </body>
     </html>
   );
 }
