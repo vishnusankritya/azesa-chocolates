@@ -18,6 +18,10 @@ body {
   color: #1c1109;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 .scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;

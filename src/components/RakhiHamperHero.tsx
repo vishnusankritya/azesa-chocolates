@@ -16,7 +16,7 @@ export default function RakhiHamperHero() {
 
   return (
     <>
-      <section className="relative isolate z-10 min-h-[760px] rounded-t-none rounded-b-[1.25rem] bg-[#fcf9f1] md:min-h-[800px]">
+      <section id="rakhi-hamper" className="relative isolate z-10 min-h-[760px] scroll-mt-24 rounded-t-none rounded-b-[1.25rem] bg-[#fcf9f1] md:min-h-[800px]">
         {/* Playful decorations */}
         <div className="pointer-events-none absolute right-[26%] -top-14 text-5xl text-[#9a4600] drop-shadow-sm md:text-6xl" aria-hidden>
           ϟ

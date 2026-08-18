@@ -143,23 +143,39 @@ export default function CategoriesSection() {
         </div>
 
         <div className="flex flex-wrap items-start justify-center gap-8 md:gap-10">
-          {categories.map((c) => (
-            <Link
-              key={c.id}
-              href={`/shop?category=${c.id}`}
-              className="group flex w-[176px] flex-col items-center"
-            >
-              {/* Uniform shape zone: tall enough for the rotated diamond's overflow,
-                  so every label sits on the same baseline. */}
-              <div className="flex h-[280px] w-full items-center justify-center">
-                <ShapeTile c={c} />
-              </div>
-              <p className="text-center font-heading text-[15px] font-black uppercase tracking-wide leading-tight text-brand-dark">
-                {c.label}
-              </p>
-            </Link>
-          ))}
-        </div>
+                  {categories.map((c) => {
+                    const content = (
+                      <>
+                        {/* Uniform shape zone: tall enough for the rotated diamond's overflow,
+                            so every label sits on the same baseline. */}
+                        <div className="flex h-[280px] w-full items-center justify-center">
+                          <ShapeTile c={c} />
+                        </div>
+                        <p className="text-center font-heading text-[15px] font-black uppercase tracking-wide leading-tight text-brand-dark">
+                          {c.label}
+                        </p>
+                      </>
+                    );
+
+                    return c.id === "festivals" ? (
+                      <a
+                        key={c.id}
+                        href="#rakhi-hamper"
+                        className="group flex w-[176px] flex-col items-center"
+                      >
+                        {content}
+                      </a>
+                    ) : (
+                      <Link
+                        key={c.id}
+                        href={`/shop?category=${c.id}`}
+                        className="group flex w-[176px] flex-col items-center"
+                      >
+                        {content}
+                      </Link>
+                    );
+                  })}
+                </div>
 
         <div className="mt-7 text-center md:hidden">
           <Button href="/shop">View All</Button>

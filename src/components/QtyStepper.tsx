@@ -24,7 +24,7 @@ export default function QtyStepper({
         type="button"
         aria-label="Increase quantity"
         onClick={onInc}
-        className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-yellow font-heading text-xl font-black leading-none text-brand-dark transition-colors hover:bg-brand-dark hover:text-brand-yellow"
+        className="flex h-10 w-10 items-center justify-center rounded-full font-heading text-xl font-black leading-none text-brand-dark transition-colors hover:bg-brand-dark hover:text-brand-cream"
       >
         +
       </button>
