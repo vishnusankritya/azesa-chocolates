@@ -34,9 +34,20 @@ export default function AddToCartButton({
       );
     }
 
-    // In-cart compact state: an increment (+) button plus a "Go to Cart" button.
+    // In-cart compact state: − / qty / + stepper plus a "Go to Cart" button.
     return (
       <div className={`flex items-center gap-1.5 ${className}`}>
+        <button
+          type="button"
+          aria-label="Decrease quantity"
+          onClick={() => setQty(id, item.qty - 1)}
+          className="flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-full border-2 border-brand-dark bg-brand-cream text-base font-black leading-none text-brand-dark shadow-[2px_2px_0_0_#1c1109] transition-colors hover:bg-brand-dark hover:text-brand-cream"
+        >
+          −
+        </button>
+        <span className="w-6 shrink-0 text-center font-heading text-sm font-black text-brand-dark">
+          {item.qty}
+        </span>
         <button
           type="button"
           aria-label="Increase quantity"

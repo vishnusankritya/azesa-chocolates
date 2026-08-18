@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "@/db";
+import { serial } from "@/db/mutex";
 import { products } from "@/db/schema";
 import { requireAdmin } from "@/lib/auth";
 import { isSameOrigin } from "@/lib/security";
@@ -12,7 +13,7 @@ export async function GET(req: Request) {
   if (!requireAdmin(req)) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
-  const rows = await db.select().from(products).orderBy(products.createdAt);
+  const rows = await serial(() => db.select().from(products).orderBy(products.createdAt));
   return NextResponse.json(rows);
 }
 
@@ -36,23 +37,25 @@ export async function POST(req: Request) {
   }
   const b = parsed.data;
 
-  const [row] = await db
-    .insert(products)
-    .values({
-      slug: b.slug,
-      name: b.name,
-      type: b.type,
-      price: b.price,
-      mrp: b.mrp ?? null,
-      accentColor: b.accentColor || null,
-      ingredient: b.ingredient ?? null,
-      tagline: b.tagline ?? null,
-      occasion: b.occasion ?? null,
-      contents: b.contents ?? null,
-      imageUrl: b.imageUrl ?? null,
-      active: b.active ?? true,
-    })
-    .returning();
+  const [row] = await serial(() =>
+    db
+      .insert(products)
+      .values({
+        slug: b.slug,
+        name: b.name,
+        type: b.type,
+        price: b.price,
+        mrp: b.mrp ?? null,
+        accentColor: b.accentColor || null,
+        ingredient: b.ingredient ?? null,
+        tagline: b.tagline ?? null,
+        occasion: b.occasion ?? null,
+        contents: b.contents ?? null,
+        imageUrl: b.imageUrl ?? null,
+        active: b.active ?? true,
+      })
+      .returning()
+  );
 
   return NextResponse.json(row, { status: 201 });
 }

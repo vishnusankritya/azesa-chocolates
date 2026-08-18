@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { desc } from "drizzle-orm";
 import { db } from "@/db";
+import { serial } from "@/db/mutex";
 import { orders, orderItems, customers, addresses } from "@/db/schema";
 import { requireAdmin } from "@/lib/auth";
 
@@ -12,11 +13,14 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 
-  const orderRows = await db.select().from(orders).orderBy(desc(orders.createdAt));
-  // PGlite is single-connection WASM — run queries sequentially, not in parallel.
-  const items = await db.select().from(orderItems);
-  const custs = await db.select().from(customers);
-  const addrs = await db.select().from(addresses);
+  // PGlite is single-connection WASM — serialize the whole fetch as one unit.
+  const [orderRows, items, custs, addrs] = await serial(async () => {
+    const o = await db.select().from(orders).orderBy(desc(orders.createdAt));
+    const i = await db.select().from(orderItems);
+    const c = await db.select().from(customers);
+    const a = await db.select().from(addresses);
+    return [o, i, c, a] as const;
+  });
 
   const data = orderRows.map((o) => ({
     id: o.id,

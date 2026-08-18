@@ -12,6 +12,7 @@ import {
 import { createRazorpayOrder, isRazorpayConfigured } from "@/lib/razorpay";
 import { isSameOrigin, rateLimit, clientIp } from "@/lib/security";
 import { checkoutSchema } from "@/lib/validators";
+import { serial } from "@/db/mutex";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -56,10 +57,9 @@ export async function POST(req: Request) {
   // Load products from the DB (authoritative prices — never trust the client's totals).
   // Catalog identifiers exposed to the client are slugs ("mango", "rakhi-chaos-hamper").
   const productIds = items.map((i) => i.productId);
-  const rows = await db
-    .select()
-    .from(productsTable)
-    .where(inArray(productsTable.slug, productIds));
+  const rows = await serial(() =>
+    db.select().from(productsTable).where(inArray(productsTable.slug, productIds))
+  );
 
   const productBySlug = new Map<string, (typeof rows)[number]>();
   for (const row of rows) productBySlug.set(row.slug, row);
@@ -86,7 +86,8 @@ export async function POST(req: Request) {
 
   let result: { orderId: string; razorpayOrderId: string | null } | undefined;
 
-  await db.transaction(async (tx) => {
+  await serial(() =>
+    db.transaction(async (tx) => {
     // Find or create the customer by phone.
     let [cust] = await tx
       .select()
@@ -149,7 +150,8 @@ export async function POST(req: Request) {
       });
       result = { orderId: order.id, razorpayOrderId: null };
     }
-  });
+    })
+  );
 
   return NextResponse.json(
     {

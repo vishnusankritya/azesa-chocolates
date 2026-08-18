@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
+import { serial } from "@/db/mutex";
 import { orders } from "@/db/schema";
 import { requireAdmin } from "@/lib/auth";
 import { isSameOrigin } from "@/lib/security";
@@ -29,11 +30,13 @@ export async function PATCH(
     return NextResponse.json({ error: "Invalid status" }, { status: 400 });
   }
 
-  const [row] = await db
-    .update(orders)
-    .set({ status: parsed.data.status })
-    .where(eq(orders.id, id))
-    .returning({ id: orders.id, status: orders.status });
+  const [row] = await serial(() =>
+    db
+      .update(orders)
+      .set({ status: parsed.data.status })
+      .where(eq(orders.id, id))
+      .returning({ id: orders.id, status: orders.status })
+  );
 
   if (!row) return NextResponse.json({ error: "not_found" }, { status: 404 });
   return NextResponse.json(row);

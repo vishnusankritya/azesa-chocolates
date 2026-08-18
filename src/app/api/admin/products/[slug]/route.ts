@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
+import { serial } from "@/db/mutex";
 import { products } from "@/db/schema";
 import { requireAdmin } from "@/lib/auth";
 import { isSameOrigin } from "@/lib/security";
@@ -30,11 +31,9 @@ export async function PATCH(
   }
 
   const patch = parsed.data;
-  const [row] = await db
-    .update(products)
-    .set(patch)
-    .where(eq(products.slug, slug))
-    .returning();
+  const [row] = await serial(() =>
+    db.update(products).set(patch).where(eq(products.slug, slug)).returning()
+  );
 
   if (!row) return NextResponse.json({ error: "not_found" }, { status: 404 });
   return NextResponse.json(row);
@@ -48,6 +47,6 @@ export async function DELETE(
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
   const { slug } = await params;
-  await db.delete(products).where(eq(products.slug, slug));
+  await serial(() => db.delete(products).where(eq(products.slug, slug)));
   return NextResponse.json({ ok: true });
 }
