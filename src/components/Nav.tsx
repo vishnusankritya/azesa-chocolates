@@ -1,16 +1,25 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import Button from "@/components/ui/Button";
 import { useCart } from "@/context/CartContext";
 
+const LINKS = [
+  { href: "/shop", label: "Products" },
+  { href: "/our-story", label: "Our Story" },
+  { href: "/for-business", label: "For Business" },
+  { href: "/contact", label: "Contact" },
+];
+
 export default function Nav() {
   const { count } = useCart();
+  const [open, setOpen] = useState(false);
 
   return (
     <header className="w-full bg-brand-cream rounded-2xl sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-        <Link href="/" className="flex flex-col leading-none">
+      <div className="max-w-7xl mx-auto px-5 md:px-6 h-20 flex items-center justify-between">
+        <Link href="/" className="flex flex-col leading-none" onClick={() => setOpen(false)}>
           <span className="flex items-center gap-1">
             <span className="font-script text-3xl text-brand-dark">Azesa</span>
             <span className="w-1.5 h-1.5 rounded-full bg-brand-orange" />
@@ -21,21 +30,14 @@ export default function Nav() {
         </Link>
 
         <nav className="hidden md:flex items-center gap-8">
-          <Link href="/shop" className="text-sm font-extrabold text-brand-dark hover:text-brand-orange transition-colors">
-            Products
-          </Link>
-          <Link href="/our-story" className="text-sm font-extrabold text-brand-dark hover:text-brand-orange transition-colors">
-            Our Story
-          </Link>
-          <Link href="/for-business" className="text-sm font-extrabold text-brand-dark hover:text-brand-orange transition-colors">
-            For Business
-          </Link>
-          <Link href="/contact" className="text-sm font-extrabold text-brand-dark hover:text-brand-orange transition-colors">
-            Contact
-          </Link>
+          {LINKS.map((l) => (
+            <Link key={l.href} href={l.href} className="text-sm font-extrabold text-brand-dark hover:text-brand-orange transition-colors">
+              {l.label}
+            </Link>
+          ))}
         </nav>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 md:gap-3">
           <Link
             href="/cart"
             aria-label={`Cart, ${count} item${count === 1 ? "" : "s"}`}
@@ -52,11 +54,48 @@ export default function Nav() {
               </span>
             )}
           </Link>
+
+          {/* Mobile hamburger */}
+          <button
+            type="button"
+            aria-label={open ? "Close menu" : "Open menu"}
+            aria-expanded={open}
+            onClick={() => setOpen((v) => !v)}
+            className="relative z-10 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border-2 border-brand-dark text-brand-dark transition-colors hover:bg-brand-dark hover:text-brand-cream md:hidden"
+          >
+            <div className="flex flex-col items-center gap-[5px]">
+              <span className={`h-0.5 w-5 rounded-full bg-current transition-transform duration-200 ${open ? "translate-y-[7px] rotate-45" : ""}`} />
+              <span className={`h-0.5 w-5 rounded-full bg-current transition-opacity duration-200 ${open ? "opacity-0" : ""}`} />
+              <span className={`h-0.5 w-5 rounded-full bg-current transition-transform duration-200 ${open ? "-translate-y-[7px] -rotate-45" : ""}`} />
+            </div>
+          </button>
+
           <Button href="/shop" className="hidden md:inline-flex">
             Order Now
           </Button>
         </div>
       </div>
+
+      {/* Mobile dropdown */}
+      {open && (
+        <div className="md:hidden border-t-2 border-brand-dark/10 px-5 pb-5 pt-2">
+          <nav className="flex flex-col gap-1">
+            {LINKS.map((l) => (
+              <Link
+                key={l.href}
+                href={l.href}
+                onClick={() => setOpen(false)}
+                className="rounded-xl px-3 py-2.5 font-heading text-sm font-black uppercase tracking-wide text-brand-dark transition-colors hover:bg-brand-dark hover:text-brand-cream"
+              >
+                {l.label}
+              </Link>
+            ))}
+          </nav>
+          <Button href="/shop" className="mt-3 w-full justify-center" onClick={() => setOpen(false)}>
+            Order Now
+          </Button>
+        </div>
+      )}
     </header>
   );
 }

@@ -20,9 +20,10 @@ interface CartContextValue {
   items: CartItem[];
   count: number;
   subtotal: number;
-  add: (id: string) => void;
+  add: (id: string, qty?: number) => void;
   remove: (id: string) => void;
   setQty: (id: string, qty: number) => void;
+  clear: () => void;
 }
 
 const CartContext = createContext<CartContextValue | null>(null);
@@ -54,12 +55,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
   }, [items, mounted]);
 
-  const add = useCallback((id: string) => {
+  const add = useCallback((id: string, qty = 1) => {
+    const n = Math.max(1, Math.min(99, Math.floor(qty)));
     setItems((prev) => {
       const found = prev.find((i) => i.id === id);
       return found
-        ? prev.map((i) => (i.id === id ? { ...i, qty: i.qty + 1 } : i))
-        : [...prev, { id, qty: 1 }];
+        ? prev.map((i) => (i.id === id ? { ...i, qty: Math.min(99, i.qty + n) } : i))
+        : [...prev, { id, qty: n }];
     });
   }, []);
 
@@ -86,9 +88,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
     [items]
   );
 
+  const clear = useCallback(() => setItems([]), []);
+
   const value = useMemo(
-    () => ({ items, count, subtotal, add, remove, setQty }),
-    [items, count, subtotal, add, remove, setQty]
+    () => ({ items, count, subtotal, add, remove, setQty, clear }),
+    [items, count, subtotal, add, remove, setQty, clear]
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

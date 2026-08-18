@@ -6,14 +6,14 @@ import AddToCartButton from "@/components/AddToCartButton";
 
 export default function ProductCard({ product }: { product: Product }) {
   return (
-    <div className="group flex flex-col rounded-2xl border-2 border-brand-dark bg-[#fbf7ee] p-3 transition-transform duration-200 hover:-translate-y-1 hover:shadow-[4px_4px_0_0_#1c1109]">
+    <div className="group flex flex-col rounded-2xl border-2 border-brand-dark bg-[#fbf7ee] p-2.5 transition-transform duration-200 hover:scale-[1.04] hover:shadow-[5px_5px_0_0_#1c1109]">
       <Link href={`/shop/${product.id}`} className="flex flex-col">
         <div className="flex aspect-square items-center justify-center overflow-hidden rounded-xl bg-white">
           {product.image ? (
             <img
               src={product.image}
               alt={product.name}
-              className="h-full w-full object-contain p-2 transition-transform duration-300 group-hover:scale-105"
+              className="h-full w-full object-contain p-1.5 transition-transform duration-300 group-hover:scale-105"
             />
           ) : (
             <div
@@ -30,7 +30,7 @@ export default function ProductCard({ product }: { product: Product }) {
           )}
         </div>
         <div className="mt-3 border-t border-brand-dark/15 pb-1 pt-3">
-          <p className="font-heading text-center text-base font-black leading-tight text-brand-dark md:text-lg">
+          <p className="font-heading text-center text-sm font-black leading-tight text-brand-dark md:text-base">
             {product.name}
           </p>
           <p className="mt-0.5 text-center text-sm font-semibold text-brand-dark/45">₹{product.price}</p>

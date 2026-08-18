@@ -18,6 +18,10 @@ body {
   color: #1c1109;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 .scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;
@@ -101,3 +105,20 @@ body {
     animation: none !important;
   }
 }
+
+.input {
+  width: 100%;
+  border-radius: 0.75rem;
+  border: 2px solid rgba(28,17,9,0.25);
+  background: #fff;
+  padding: 0.625rem 0.875rem;
+  font-size: 0.875rem;
+  color: #1c1109;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+.input::placeholder { color: rgba(28,17,9,0.35); }
+.input:focus { border-color: #1c1109; }
+
+.scroll-hide { scrollbar-width: none; -ms-overflow-style: none; }
+.scroll-hide::-webkit-scrollbar { display: none; }

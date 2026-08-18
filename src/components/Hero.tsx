@@ -39,7 +39,7 @@ export default function Hero() {
 
           {/* CTA + description side-by-side (Marco pattern) */}
           <div className="flex flex-wrap items-start gap-5">
-            <Button href="/shop">Shop Now</Button>
+            <Button href="/shop/rakhi-chaos-hamper">Shop Now</Button>
             <p className="text-white/85 text-sm leading-relaxed max-w-[200px] pt-1">
               No palm oil. No artificial colours. Just real Indian chocolate.
             </p>
@@ -58,7 +58,7 @@ export default function Hero() {
                 <img
                   src="/rakhi-hamper.png"
                   alt="Azesa Happy Rakhi Hamper"
-                  className="h-[460px] w-[460px] object-contain transition-transform duration-300 hover:scale-110"
+                  className="h-[460px] w-[460px] cursor-pointer object-contain transition-transform duration-300 hover:scale-110"
                 />
               </div>
             </div>

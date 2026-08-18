@@ -1,11 +1,12 @@
 import { notFound } from "next/navigation";
-import Link from "next/link";
 import { products } from "@/data/products";
 import AnnouncementBar from "@/components/AnnouncementBar";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
 import AddToCartButton from "@/components/AddToCartButton";
+import Button from "@/components/ui/Button";
+import HamperDetail from "@/components/HamperDetail";
 
 export function generateStaticParams() {
   return products.map((p) => ({ id: p.id }));
@@ -27,6 +28,23 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
   const product = products.find((p) => p.id === id);
   if (!product) notFound();
 
+  if (product.type === "hamper") {
+    return (
+      <>
+        <div className="bg-brand-cream p-2 md:p-3">
+          <div className="flex flex-col gap-2 md:gap-3">
+            <AnnouncementBar />
+            <Nav />
+          </div>
+        </div>
+        <main>
+          <HamperDetail product={product} />
+        </main>
+        <Footer />
+      </>
+    );
+  }
+
   const related = [
     ...products.filter((p) => p.id !== product.id && p.type === product.type),
     ...products.filter((p) => p.id !== product.id && p.type !== product.type),
@@ -43,12 +61,9 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
       <main>
         <section className="bg-white py-12 md:py-16">
           <div className="mx-auto max-w-7xl px-6 md:px-10">
-            <Link
-              href="/shop"
-              className="inline-flex items-center gap-2 font-heading text-sm font-black uppercase tracking-[0.12em] text-[#9a4600] transition-colors hover:text-brand-orange"
-            >
+            <Button href="/shop" className="inline-flex">
               ← Back to shop
-            </Link>
+            </Button>
 
             <div className="mt-8 grid gap-10 md:grid-cols-2 md:gap-14">
               <div className="flex aspect-square items-center justify-center overflow-hidden rounded-2xl border-2 border-brand-dark bg-white">
@@ -104,12 +119,9 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
                 >
                   You may also like
                 </h2>
-                <Link
-                  href="/shop"
-                  className="hidden font-heading text-sm font-black uppercase tracking-[0.1em] text-[#9a4600] transition-colors hover:text-brand-orange md:inline-block"
-                >
-                  View all →
-                </Link>
+                <Button href="/shop" className="hidden md:inline-flex">
+                  View All
+                </Button>
               </div>
               <div className="grid grid-cols-2 gap-4 sm:gap-5 md:grid-cols-3 lg:grid-cols-4">
                 {related.map((p) => (
