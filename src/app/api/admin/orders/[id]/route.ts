@@ -3,35 +3,35 @@ import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { orders } from "@/db/schema";
 import { requireAdmin } from "@/lib/auth";
+import { isSameOrigin } from "@/lib/security";
+import { orderStatusSchema } from "@/lib/validators";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-
-const ALLOWED = ["pending", "paid", "fulfilled", "cancelled"];
 
 export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  if (!requireAdmin(req)) {
+  if (!requireAdmin(req) || !isSameOrigin(req)) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 
   const { id } = await params;
-  let body: { status?: string };
+  let body: unknown;
   try {
     body = await req.json();
   } catch {
     return NextResponse.json({ error: "Invalid request" }, { status: 400 });
   }
-
-  if (!body?.status || !ALLOWED.includes(body.status)) {
+  const parsed = orderStatusSchema.safeParse(body);
+  if (!parsed.success) {
     return NextResponse.json({ error: "Invalid status" }, { status: 400 });
   }
 
   const [row] = await db
     .update(orders)
-    .set({ status: body.status })
+    .set({ status: parsed.data.status })
     .where(eq(orders.id, id))
     .returning({ id: orders.id, status: orders.status });
 

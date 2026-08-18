@@ -10,45 +10,48 @@ import {
   payments as paymentsTable,
 } from "@/db/schema";
 import { createRazorpayOrder, isRazorpayConfigured } from "@/lib/razorpay";
+import { isSameOrigin, rateLimit, clientIp } from "@/lib/security";
+import { checkoutSchema } from "@/lib/validators";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+
+const MAX_BODY_BYTES = 256 * 1024; // 256kb — reject oversized JSON early
 
 function err(status: number, error: string) {
   return NextResponse.json({ error }, { status });
 }
 
-interface CheckoutItem {
-  productId: string;
-  qty: number;
-}
-
-interface CheckoutBody {
-  items?: CheckoutItem[];
-  customer?: { name?: string; phone?: string; email?: string };
-  address?: { address?: string; city?: string; state?: string; pincode?: string };
-  payment?: "cod" | "online";
-}
-
 export async function POST(req: Request) {
-  let body: CheckoutBody;
+  // CSRF: reject cross-origin mutating requests.
+  if (!isSameOrigin(req)) {
+    return err(403, "Cross-origin request rejected");
+  }
+
+  // Rate limit the write path per IP.
+  if (!rateLimit(`checkout:${clientIp(req)}`, 10, 60_000)) {
+    return err(429, "Too many attempts. Please try again shortly.");
+  }
+
+  // Body size cap to prevent oversized-JSON DoS.
+  const raw = await req.text();
+  if (raw.length > MAX_BODY_BYTES) {
+    return err(413, "Request body too large");
+  }
+
+  let bodyJson: unknown;
   try {
-    body = (await req.json()) as CheckoutBody;
+    bodyJson = raw ? JSON.parse(raw) : null;
   } catch {
     return err(400, "Invalid request body");
   }
 
-  const items = body?.items;
-  const customer = body?.customer;
-  const address = body?.address;
-  const payment = body?.payment;
-
-  if (!Array.isArray(items) || items.length === 0) return err(400, "Your cart is empty");
-  if (!customer?.name?.trim() || !customer?.phone?.trim())
-    return err(400, "Name and phone are required");
-  if (!address?.address?.trim() || !address?.city?.trim() || !address?.state?.trim() || !address?.pincode?.trim())
-    return err(400, "Complete delivery address is required");
-  if (payment !== "cod" && payment !== "online") return err(400, "Invalid payment method");
+  const parsed = checkoutSchema.safeParse(bodyJson);
+  if (!parsed.success) {
+    const msg = parsed.error.issues[0]?.message || "Invalid checkout data";
+    return err(400, msg);
+  }
+  const { items, customer, address, payment } = parsed.data;
 
   // Load products from the DB (authoritative prices — never trust the client's totals).
   // Catalog identifiers exposed to the client are slugs ("mango", "rakhi-chaos-hamper").

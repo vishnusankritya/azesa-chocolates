@@ -8,6 +8,8 @@ import AddToCartButton from "@/components/AddToCartButton";
 import Button from "@/components/ui/Button";
 import HamperDetail from "@/components/HamperDetail";
 
+export const revalidate = 300; // ISR product detail
+
 export async function generateStaticParams() {
   const list = await getProducts();
   return list.map((p) => ({ id: p.id }));

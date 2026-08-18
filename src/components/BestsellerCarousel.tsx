@@ -42,6 +42,8 @@ export default function BestsellerCarousel({ products }: { products: CatalogProd
                                     <img
                                       src={product.image}
                                       alt={product.name}
+                                      loading="lazy"
+                                      decoding="async"
                                       className="w-full h-full object-contain p-2 transition-transform duration-200 group-hover:scale-110 md:p-3"
                                     />
                                   ) : (

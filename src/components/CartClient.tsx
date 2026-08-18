@@ -140,6 +140,8 @@ export default function CartClient() {
                       <img
                         src={product.image}
                         alt={product.name}
+                        loading="lazy"
+                        decoding="async"
                         className="h-full w-full object-contain p-2"
                       />
                     )}

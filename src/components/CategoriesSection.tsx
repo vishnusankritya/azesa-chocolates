@@ -81,6 +81,8 @@ function StarShape({ bg, img, alt }: { bg: string; img: string; alt: string }) {
             <img
               src={img}
               alt={alt}
+              loading="lazy"
+              decoding="async"
               className="h-full w-full object-contain transition-transform duration-200 group-hover:scale-110 drop-shadow-[2px_2px_0_rgba(0,0,0,0.15)]"
             />
           </div>
@@ -115,6 +117,8 @@ function ShapeTile({ c }: { c: (typeof categories)[number] }) {
                 <img
                   src={c.img}
                   alt={c.label}
+                  loading="lazy"
+                  decoding="async"
                   className={`h-full w-full object-contain transition-transform duration-200 group-hover:scale-110 ${
                     c.shape === "diamond" ? "-rotate-45" : ""
                   } drop-shadow-[3px_3px_0_rgba(0,0,0,0.2)]`}

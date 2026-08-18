@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { products } from "@/db/schema";
 import { requireAdmin } from "@/lib/auth";
+import { isSameOrigin } from "@/lib/security";
+import { createProductSchema } from "@/lib/validators";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -18,46 +20,37 @@ export async function POST(req: Request) {
   if (!requireAdmin(req)) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
+  if (!isSameOrigin(req)) {
+    return NextResponse.json({ error: "Cross-origin request rejected" }, { status: 403 });
+  }
 
-  let body: {
-    slug?: string;
-    name?: string;
-    type?: string;
-    price?: number;
-    mrp?: number;
-    accentColor?: string;
-    ingredient?: string;
-    tagline?: string;
-    occasion?: string;
-    contents?: string[];
-    imageUrl?: string;
-    active?: boolean;
-  };
+  let body: unknown;
   try {
     body = await req.json();
   } catch {
     return NextResponse.json({ error: "Invalid request" }, { status: 400 });
   }
-
-  if (!body?.slug?.trim() || !body?.name?.trim() || !body?.type || typeof body.price !== "number") {
-    return NextResponse.json({ error: "slug, name, type and price are required" }, { status: 400 });
+  const parsed = createProductSchema.safeParse(body);
+  if (!parsed.success) {
+    return NextResponse.json({ error: parsed.error.issues[0]?.message || "Invalid product" }, { status: 400 });
   }
+  const b = parsed.data;
 
   const [row] = await db
     .insert(products)
     .values({
-      slug: body.slug.trim(),
-      name: body.name.trim(),
-      type: body.type,
-      price: Math.round(body.price),
-      mrp: typeof body.mrp === "number" ? Math.round(body.mrp) : null,
-      accentColor: body.accentColor || null,
-      ingredient: body.ingredient || null,
-      tagline: body.tagline || null,
-      occasion: body.occasion || null,
-      contents: body.contents ?? null,
-      imageUrl: body.imageUrl || null,
-      active: body.active ?? true,
+      slug: b.slug,
+      name: b.name,
+      type: b.type,
+      price: b.price,
+      mrp: b.mrp ?? null,
+      accentColor: b.accentColor || null,
+      ingredient: b.ingredient ?? null,
+      tagline: b.tagline ?? null,
+      occasion: b.occasion ?? null,
+      contents: b.contents ?? null,
+      imageUrl: b.imageUrl ?? null,
+      active: b.active ?? true,
     })
     .returning();
 

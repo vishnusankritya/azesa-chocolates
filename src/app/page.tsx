@@ -14,6 +14,9 @@ import ReviewsSection from "@/components/ReviewsSection";
 import Footer from "@/components/Footer";
 import { getProducts } from "@/server/catalog";
 
+// ISR: catalog rarely changes; re-render at most every 5 min, cache to all.
+export const revalidate = 300;
+
 export default async function Home() {
   const products = await getProducts();
 

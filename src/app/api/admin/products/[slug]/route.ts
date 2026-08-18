@@ -3,6 +3,8 @@ import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { products } from "@/db/schema";
 import { requireAdmin } from "@/lib/auth";
+import { isSameOrigin } from "@/lib/security";
+import { updateProductSchema } from "@/lib/validators";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -11,39 +13,23 @@ export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ slug: string }> }
 ) {
-  if (!requireAdmin(req)) {
+  if (!requireAdmin(req) || !isSameOrigin(req)) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 
   const { slug } = await params;
-  let body: Record<string, unknown>;
+  let body: unknown;
   try {
     body = await req.json();
   } catch {
     return NextResponse.json({ error: "Invalid request" }, { status: 400 });
   }
-
-  const allowed: (keyof typeof products.$inferSelect)[] = [
-    "name",
-    "type",
-    "price",
-    "mrp",
-    "accentColor",
-    "ingredient",
-    "tagline",
-    "occasion",
-    "contents",
-    "imageUrl",
-    "active",
-  ];
-  const patch: Record<string, unknown> = {};
-  for (const key of allowed) {
-    if (key in body) patch[key] = body[key] as never;
-  }
-  if (Object.keys(patch).length === 0) {
+  const parsed = updateProductSchema.safeParse(body);
+  if (!parsed.success || Object.keys(parsed.data).length === 0) {
     return NextResponse.json({ error: "Nothing to update" }, { status: 400 });
   }
 
+  const patch = parsed.data;
   const [row] = await db
     .update(products)
     .set(patch)
@@ -55,10 +41,10 @@ export async function PATCH(
 }
 
 export async function DELETE(
-  _req: Request,
+  req: Request,
   { params }: { params: Promise<{ slug: string }> }
 ) {
-  if (!requireAdmin(_req)) {
+  if (!requireAdmin(req) || !isSameOrigin(req)) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
   const { slug } = await params;

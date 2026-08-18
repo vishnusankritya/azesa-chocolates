@@ -4,6 +4,8 @@ import ShopClient from "@/components/ShopClient";
 import Footer from "@/components/Footer";
 import { getProducts } from "@/server/catalog";
 
+export const revalidate = 300; // ISR catalog
+
 export const metadata = {
   title: "Shop All — Azesa Chocolates",
   description:

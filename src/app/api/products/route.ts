@@ -9,5 +9,9 @@ export async function GET(request: Request) {
 
   const list = await getProducts();
   const filtered = type ? list.filter((p) => p.type === type) : list;
-  return NextResponse.json(filtered);
+  return NextResponse.json(filtered, {
+    headers: {
+      "Cache-Control": "public, s-maxage=300, stale-while-revalidate=60",
+    },
+  });
 }

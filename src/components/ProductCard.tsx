@@ -13,6 +13,8 @@ export default function ProductCard({ product }: { product: CatalogProduct }) {
             <img
               src={product.image}
               alt={product.name}
+              loading="lazy"
+              decoding="async"
               className="h-full w-full object-contain p-1.5 transition-transform duration-300 group-hover:scale-105"
             />
           ) : (
