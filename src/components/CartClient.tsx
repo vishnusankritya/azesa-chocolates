@@ -13,6 +13,9 @@ export default function CartClient() {
 
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [placed, setPlaced] = useState(false);
+  const [placing, setPlacing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [orderId, setOrderId] = useState<string | null>(null);
   const [form, setForm] = useState({
     name: "",
     phone: "",
@@ -31,14 +34,42 @@ export default function CartClient() {
   const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm((f) => ({ ...f, [k]: e.target.value }));
 
-  const handlePlaceOrder = (e: React.FormEvent) => {
+  const handlePlaceOrder = async (e: React.FormEvent) => {
     e.preventDefault();
-    setPlaced(true);
+    setPlacing(true);
+    setError(null);
+    const payload = {
+      items: items.map((i) => ({ productId: i.id, qty: i.qty })),
+      customer: { name: form.name, phone: form.phone, email: form.email || undefined },
+      address: {
+        address: form.address,
+        city: form.city,
+        state: form.state,
+        pincode: form.pincode,
+      },
+      payment: form.payment === "cod" ? "cod" : "online",
+    };
+    try {
+      const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || "We couldn't place your order. Please try again.");
+      setOrderId(data.orderId);
+      setPlaced(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
+    } finally {
+      setPlacing(false);
+    }
   };
 
   const handleDone = () => {
     setCheckoutOpen(false);
     setPlaced(false);
+    setOrderId(null);
     setForm((f) => ({ ...f, name: "", phone: "", email: "", address: "", city: "", state: "", pincode: "" }));
     clear();
   };
@@ -201,6 +232,11 @@ export default function CartClient() {
                   </svg>
                 </div>
                 <h2 className="mt-6 font-heading text-3xl font-black text-brand-dark">Order placed!</h2>
+                {orderId && (
+                  <p className="mt-2 inline-block rounded-full border border-brand-dark/20 bg-white px-4 py-1 font-heading text-xs font-black uppercase tracking-[0.15em] text-brand-dark">
+                    Order #{orderId.slice(0, 8).toUpperCase()}
+                  </p>
+                )}
                 <p className="mt-3 text-brand-dark/70">
                   Thank you, {form.name || "chocolate lover"}. A confirmation has been sent to{" "}
                   <span className="font-semibold text-brand-dark">{form.phone || form.email || "your contact"}</span>.
@@ -209,7 +245,7 @@ export default function CartClient() {
                   {form.city ? `, ${form.city}` : ""}.
                 </p>
                 <div className="mt-6 rounded-2xl border border-brand-dark/15 bg-white p-4 text-left">
-                  <div className="flex justify-between text-brand-dark/70"><span>Total paid</span><span className="font-heading text-brand-dark">₹{subtotal}</span></div>
+                  <div className="flex justify-between text-brand-dark/70"><span>Total</span><span className="font-heading text-brand-dark">₹{subtotal}</span></div>
                   <div className="mt-1 flex justify-between text-brand-dark/70"><span>Payment</span><span className="font-heading uppercase text-brand-dark">{form.payment === "cod" ? "Cash on Delivery" : form.payment === "card" ? "Card" : "UPI"}</span></div>
                 </div>
                 <Button className="mt-7 w-full justify-center" onClick={handleDone}>
@@ -303,14 +339,21 @@ export default function CartClient() {
                     <span className="font-heading text-2xl font-black text-brand-dark">₹{subtotal}</span>
                   </div>
 
+                  {error && (
+                    <p className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-700">
+                      {error}
+                    </p>
+                  )}
+
                   <button
                     type="submit"
-                    className="mt-4 w-full cursor-pointer rounded-full border-2 border-brand-dark bg-brand-cream px-6 py-3.5 font-heading text-base font-black uppercase tracking-wide text-brand-dark shadow-[3px_3px_0_0_#1c1109] transition-all duration-150 hover:translate-x-[3px] hover:translate-y-[3px] hover:bg-brand-dark hover:text-brand-cream hover:shadow-none"
+                    disabled={placing}
+                    className="mt-4 w-full cursor-pointer rounded-full border-2 border-brand-dark bg-brand-cream px-6 py-3.5 font-heading text-base font-black uppercase tracking-wide text-brand-dark shadow-[3px_3px_0_0_#1c1109] transition-all duration-150 hover:translate-x-[3px] hover:translate-y-[3px] hover:bg-brand-dark hover:text-brand-cream hover:shadow-none disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:bg-brand-cream disabled:hover:text-brand-dark disabled:hover:shadow-[3px_3px_0_0_#1c1109]"
                   >
-                    Place order · ₹{subtotal}
+                    {placing ? "Placing order…" : `Place order · ₹${subtotal}`}
                   </button>
                   <p className="text-center text-[11px] font-semibold text-brand-dark/45">
-                    Demo checkout — connect a payment gateway to go live. Nothing is charged.
+                    Cash on Delivery creates a real order. Online payment (UPI/Card) goes live once Razorpay keys are connected.
                   </p>
                 </form>
               </>
