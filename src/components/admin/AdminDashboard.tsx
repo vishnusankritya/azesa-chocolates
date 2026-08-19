@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import ProductEditor, { type AdminProduct } from "@/components/admin/ProductEditor";
+import { orderConfirmationLink } from "@/lib/whatsapp";
 
 type Order = {
   id: string;
@@ -62,6 +63,10 @@ const AVAIL_LABEL: Record<string, string> = {
   coming_soon: "Coming soon",
   hidden: "Hidden",
 };
+
+function paymentLabelOf(m: string): string {
+  return m === "cod" ? "Cash on Delivery" : m === "upi_qr" ? "UPI (Scan & Pay)" : "Online";
+}
 
 function fmtDate(iso: string) {
   try {
@@ -164,6 +169,16 @@ export default function AdminDashboard() {
         ? "cursor-pointer rounded-full border-2 border-brand-dark bg-brand-dark px-3.5 py-1.5 font-heading text-xs font-black uppercase tracking-wide text-brand-cream transition-colors hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
         : "cursor-pointer rounded-full border-2 border-brand-dark/40 bg-white px-3.5 py-1.5 font-heading text-xs font-black uppercase tracking-wide text-brand-dark transition-colors hover:border-brand-dark hover:bg-brand-cream disabled:cursor-not-allowed disabled:opacity-50";
 
+  const waLink = (o: Order): string | null =>
+    orderConfirmationLink({
+      id: o.id.slice(0, 8).toUpperCase(),
+      amount: o.amount,
+      paymentLabel: paymentLabelOf(o.paymentMethod),
+      customerName: o.customer?.name,
+      phone: o.customer?.phone,
+      items: o.items,
+    });
+
   return (
     <div className="mx-auto max-w-6xl px-6 py-16 md:px-10">
       <div className="mb-10 flex items-start justify-between gap-4">
@@ -265,6 +280,16 @@ export default function AdminDashboard() {
               </div>
 
               <div className="mt-4 flex flex-wrap items-center gap-2">
+                {waLink(o) && (
+                  <a
+                    href={waLink(o)!}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex cursor-pointer items-center rounded-full border-2 border-[#25D366]/70 bg-[#25D366]/10 px-3.5 py-1.5 font-heading text-xs font-black uppercase tracking-wide text-[#128C4B] transition-colors hover:bg-[#25D366] hover:text-white"
+                  >
+                    WhatsApp confirm
+                  </a>
+                )}
                 {actionsFor(o.status).map(([s, label, kind]) => (
                   <button key={s} type="button" disabled={busy === o.id} onClick={() => setStatus(o.id, s)} className={actionBtn(kind)}>
                     {busy === o.id ? "…" : label}
