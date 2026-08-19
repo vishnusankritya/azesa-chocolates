@@ -1,8 +1,14 @@
 import { createHmac, timingSafeEqual } from "crypto";
+import bcrypt from "bcryptjs";
 
 const DEV_SECRET = "azesa-local-dev-secret-change-me";
 const SECRET = process.env.SESSION_SECRET || DEV_SECRET;
 const IS_PROD = process.env.NODE_ENV === "production";
+
+// Local-dev defaults (replaced by env in production). The dev password is
+// stored only as a bcrypt hash — never as plaintext.
+const DEV_ADMIN_EMAIL = "admin@azesa.in";
+const DEV_ADMIN_PASSWORD_HASH = "$2b$10$FNFxVWaua8N.WAhyMetUv.jLOPM37LMQoEF0cb9Tb5oMApPsfkcf.";
 
 // Fail fast: never boot into production with the known dev secret.
 if (IS_PROD && SECRET === DEV_SECRET) {
@@ -67,4 +73,40 @@ export function requireAdmin(req: Request): Session | null {
   const token = match ? decodeURIComponent(match[1]) : null;
   const s = verifySession(token);
   return s?.role === "admin" ? s : null;
+}
+
+/** Constant-time string comparison (length-safe): compare HMAC digests. */
+function timingSafeEqualString(a: string, b: string): boolean {
+  const aDigest = createHmac("sha256", "azesa-cred-compare").update(a).digest();
+  const bDigest = createHmac("sha256", "azesa-cred-compare").update(b).digest();
+  return timingSafeEqual(aDigest, bDigest);
+}
+
+/**
+ * Whether admin auth has usable config. In production a strong secret must be
+ * set (either a bcrypt hash via ADMIN_PASSWORD_HASH, or ADMIN_PASSWORD).
+ */
+export function adminConfigured(): boolean {
+  if (IS_PROD) {
+    return Boolean(process.env.ADMIN_PASSWORD_HASH || process.env.ADMIN_PASSWORD);
+  }
+  return true; // dev ships with a hashed default password
+}
+
+/**
+ * Verify admin credentials in constant time. Prefers a bcrypt hash
+ * (ADMIN_PASSWORD_HASH) so the password is never compared as plaintext; falls
+ * back to a plaintext ADMIN_PASSWORD only if no hash is configured. Email is
+ * always compared in constant time.
+ */
+export async function verifyAdminCredentials(email: string, password: string): Promise<boolean> {
+  const expectedEmail = (process.env.ADMIN_EMAIL || DEV_ADMIN_EMAIL).trim().toLowerCase();
+  if (!timingSafeEqualString(email.trim().toLowerCase(), expectedEmail)) return false;
+
+  const hash = process.env.ADMIN_PASSWORD_HASH || (IS_PROD ? undefined : DEV_ADMIN_PASSWORD_HASH);
+  if (hash) return bcrypt.compare(password, hash);
+
+  const plain = process.env.ADMIN_PASSWORD || (IS_PROD ? undefined : "");
+  if (plain == null || plain === "") return false;
+  return timingSafeEqualString(password, plain);
 }
