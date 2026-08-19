@@ -3,6 +3,7 @@
 import { useCart } from "@/context/CartContext";
 import Button from "@/components/ui/Button";
 import QtyStepper from "@/components/QtyStepper";
+import Link from "next/link";
 
 export default function AddToCartButton({
   id,
@@ -42,14 +43,21 @@ export default function AddToCartButton({
     const container = `flex items-center gap-1 rounded-full border-2 border-brand-dark bg-brand-cream px-1.5 py-1 font-heading text-[10px] uppercase tracking-wide shadow-[2px_2px_0_0_#1c1109] whitespace-nowrap ${className}`;
 
     if (!item) {
+      // Compact card CTA: a small round cart-icon link that routes to the cart
+      // (no add-from-card action). Once the product is in the cart the card
+      // swaps to the −/qty/+ item counter below.
       return (
-        <button
-          type="button"
-          onClick={() => add(id)}
-          className={`${container} cursor-pointer px-3 py-1.5 text-brand-dark hover:bg-brand-dark hover:text-brand-cream`}
+        <Link
+          href="/cart"
+          aria-label="View cart"
+          className="inline-flex cursor-pointer items-center justify-center rounded-full border-2 border-brand-dark bg-brand-cream p-2 text-brand-dark shadow-[2px_2px_0_0_#1c1109] transition-colors hover:bg-brand-dark hover:text-brand-cream"
         >
-          {label}
-        </button>
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+            <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <path d="M16 10a4 4 0 0 1-8 0" />
+          </svg>
+        </Link>
       );
     }
 
