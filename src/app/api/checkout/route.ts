@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { eq, inArray } from "drizzle-orm";
+import { eq, inArray, sql } from "drizzle-orm";
 import { db } from "@/db";
 import {
   products as productsTable,
@@ -68,8 +68,11 @@ export async function POST(req: Request) {
   const lineItems: { productId: string; productName: string; unitPrice: number; qty: number }[] = [];
   for (const it of items) {
     const p = productBySlug.get(it.productId);
-    if (!p || !p.active) return err(400, `A product in your cart is no longer available`);
+    if (!p || p.availability !== "available") {
+      return err(400, `A product in your cart is not currently available`);
+    }
     const qty = Math.max(1, Math.min(99, Math.floor(it.qty)));
+    if (p.stock < qty) return err(400, `Only ${p.stock} left of ${p.name}`);
     amount += p.price * qty;
     lineItems.push({
       productId: p.id,
@@ -130,6 +133,14 @@ export async function POST(req: Request) {
     await tx.insert(orderItemsTable).values(
       lineItems.map((li) => ({ orderId: order.id, ...li }))
     );
+
+    // Decrement stock for each ordered item.
+    for (const li of lineItems) {
+      await tx
+        .update(productsTable)
+        .set({ stock: sql`${productsTable.stock} - ${li.qty}` })
+        .where(eq(productsTable.id, li.productId));
+    }
 
     if (payment === "online" && isRazorpayConfigured()) {
       // Build a product snapshot for the Razorpay receipt (truncated).

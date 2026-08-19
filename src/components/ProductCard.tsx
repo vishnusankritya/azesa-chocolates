@@ -8,7 +8,7 @@ export default function ProductCard({ product }: { product: CatalogProduct }) {
   return (
     <div className="group flex flex-col rounded-2xl border-2 border-brand-dark bg-[#fbf7ee] p-2.5 transition-transform duration-200 hover:scale-[1.04] hover:shadow-[5px_5px_0_0_#1c1109]">
       <Link href={`/shop/${product.id}`} className="flex flex-col">
-        <div className="flex aspect-square items-center justify-center overflow-hidden rounded-xl bg-white">
+        <div className="relative flex aspect-square items-center justify-center overflow-hidden rounded-xl bg-white">
           {product.image ? (
             <img
               src={product.image}
@@ -30,6 +30,11 @@ export default function ProductCard({ product }: { product: CatalogProduct }) {
               </div>
             </div>
           )}
+          {product.availability && product.availability !== "available" && (
+            <span className="absolute left-2 top-2 rounded-full border-2 border-brand-dark bg-brand-dark px-2.5 py-1 font-heading text-[10px] font-black uppercase tracking-wide text-brand-cream">
+              {product.availability === "out_of_stock" ? "Out of stock" : "Coming soon"}
+            </span>
+          )}
         </div>
         <div className="mt-3 border-t border-brand-dark/15 pb-1 pt-3">
           <p className="font-heading text-center text-sm font-black leading-tight text-brand-dark md:text-base">
@@ -39,7 +44,7 @@ export default function ProductCard({ product }: { product: CatalogProduct }) {
         </div>
       </Link>
       <div className="mt-auto flex justify-center pt-1">
-        <AddToCartButton id={product.id} label="Add to Cart" compact />
+        <AddToCartButton id={product.id} label="Add to Cart" compact availability={product.availability} />
       </div>
     </div>
   );

@@ -9,13 +9,33 @@ export default function AddToCartButton({
   label = "Add to Cart",
   compact = false,
   className = "",
+  availability = "available",
 }: {
   id: string;
   label?: string;
   compact?: boolean;
   className?: string;
+  availability?: "available" | "out_of_stock" | "coming_soon" | "hidden";
 }) {
   const { items, add, setQty } = useCart();
+
+  // Not purchasable: render a static status pill instead of any button/stepper.
+  if (availability !== "available") {
+    const text =
+      availability === "out_of_stock"
+        ? "Out of stock"
+        : availability === "coming_soon"
+        ? "Coming soon"
+        : "Unavailable";
+    return (
+      <span
+        className={`inline-flex items-center justify-center rounded-full border-2 border-brand-dark/25 bg-white px-3 py-1.5 font-heading text-[11px] font-black uppercase tracking-wide text-brand-dark/45 ${className}`}
+      >
+        {text}
+      </span>
+    );
+  }
+
   const item = items.find((i) => i.id === id);
 
   if (compact) {

@@ -20,7 +20,8 @@ CREATE TABLE IF NOT EXISTS products (
   contents jsonb,
   image_url text,
   images jsonb,
-  active boolean NOT NULL DEFAULT true,
+  availability text NOT NULL DEFAULT 'available',
+  stock int NOT NULL DEFAULT 40,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now()
 );
@@ -97,7 +98,7 @@ async function main() {
   for (const p of catalog) {
     await db.execute(
       sql.raw(`
-        INSERT INTO products (slug, name, type, price, mrp, accent_color, ingredient, tagline, description, occasion, contents, image_url, images)
+        INSERT INTO products (slug, name, type, price, mrp, accent_color, ingredient, tagline, description, occasion, contents, image_url, images, availability, stock)
         VALUES (
           '${p.id.toLowerCase().replace(/['"\\]/g, "")}',
           '${p.name.replace(/'/g, "''")}',
@@ -111,7 +112,9 @@ async function main() {
           '${(p.occasion ?? "").replace(/'/g, "''")}',
           ${p.contents ? `'${JSON.stringify(p.contents).replace(/'/g, "''")}'::jsonb` : "NULL"},
           '${p.image ?? ""}',
-          '${JSON.stringify(p.image ? [p.image] : []).replace(/'/g, "''")}'::jsonb
+          '${JSON.stringify(p.image ? [p.image] : []).replace(/'/g, "''")}'::jsonb,
+          'available',
+          40
         )
         ON CONFLICT (slug) DO UPDATE SET
           name = EXCLUDED.name, type = EXCLUDED.type, price = EXCLUDED.price,
@@ -119,7 +122,8 @@ async function main() {
           ingredient = EXCLUDED.ingredient, tagline = EXCLUDED.tagline,
           description = EXCLUDED.description, occasion = EXCLUDED.occasion,
           contents = EXCLUDED.contents, image_url = EXCLUDED.image_url,
-          images = EXCLUDED.images
+          images = EXCLUDED.images, availability = EXCLUDED.availability,
+          stock = EXCLUDED.stock
       `)
     );
   }

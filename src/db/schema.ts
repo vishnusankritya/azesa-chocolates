@@ -24,7 +24,8 @@ export const products = pgTable("products", {
   contents: jsonb("contents").$type<string[]>(),
   imageUrl: text("image_url"),
   images: jsonb("images").$type<string[]>(),
-  active: boolean("active").notNull().default(true),
+  availability: text("availability").notNull().default("available"), // available | out_of_stock | coming_soon | hidden
+  stock: integer("stock").notNull().default(0),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });

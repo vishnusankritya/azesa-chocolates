@@ -99,7 +99,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
                 </p>
 
                 <div className="mt-8 flex flex-wrap items-center gap-4">
-                  <AddToCartButton id={product.id} label="Add to Cart" />
+                  <AddToCartButton id={product.id} label="Add to Cart" availability={product.availability} />
                   <div className="flex flex-wrap gap-x-5 gap-y-2">
                     {["No Palm Oil", "No Artificial Colours", "Made in India"].map((b) => (
                       <span

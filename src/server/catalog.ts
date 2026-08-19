@@ -1,4 +1,4 @@
-import { and, eq } from "drizzle-orm";
+import { and, eq, ne } from "drizzle-orm";
 import { db } from "@/db";
 import { serial } from "@/db/mutex";
 import { products as productsTable } from "@/db/schema";
@@ -9,7 +9,7 @@ export async function getProducts(): Promise<CatalogProduct[]> {
     db
       .select()
       .from(productsTable)
-      .where(eq(productsTable.active, true))
+      .where(ne(productsTable.availability, "hidden"))
       .orderBy(productsTable.createdAt)
   );
   return (rows as unknown as ProductRow[]).map(rowToProduct);
@@ -20,7 +20,7 @@ export async function getProductBySlug(slug: string): Promise<CatalogProduct | n
     db
       .select()
       .from(productsTable)
-      .where(and(eq(productsTable.active, true), eq(productsTable.slug, slug)))
+      .where(and(ne(productsTable.availability, "hidden"), eq(productsTable.slug, slug)))
       .limit(1)
   );
   return row ? rowToProduct(row as unknown as ProductRow) : null;

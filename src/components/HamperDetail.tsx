@@ -86,7 +86,7 @@ export default function HamperDetail({
             ) : null}
 
             <div className="mt-8 flex flex-wrap items-center gap-4">
-              <AddToCartButton id={product.id} />
+              <AddToCartButton id={product.id} availability={product.availability} />
               <div className="flex flex-wrap gap-x-5 gap-y-2">
                 {["No Palm Oil", "No Artificial Colours", "Made in India"].map((b) => (
                   <span key={b} className="flex items-center gap-1.5 text-sm font-bold text-brand-dark/55">

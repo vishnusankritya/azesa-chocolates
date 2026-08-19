@@ -47,7 +47,8 @@ export const createProductSchema = z.object({
   contents: z.array(z.string()).max(50).nullable().optional(),
   imageUrl: z.string().max(500).nullable().optional(),
   images: z.array(z.string().max(500)).max(20).nullable().optional(),
-  active: z.boolean().optional(),
+  availability: z.enum(["available", "out_of_stock", "coming_soon", "hidden"]).optional(),
+  stock: z.number().int().min(0).max(1000000).optional(),
 });
 
 export const updateProductSchema = createProductSchema.partial();

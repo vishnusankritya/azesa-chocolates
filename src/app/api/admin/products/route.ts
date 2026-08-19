@@ -54,7 +54,8 @@ export async function POST(req: Request) {
         contents: b.contents ?? null,
         imageUrl: b.imageUrl ?? null,
         images: b.images ?? null,
-        active: b.active ?? true,
+        availability: b.availability ?? "available",
+        stock: b.stock ?? 0,
       })
       .returning()
   );

@@ -10,6 +10,8 @@ export interface CatalogProduct {
   occasion?: string;
   contents?: string[];
   image?: string;
+  availability?: "available" | "out_of_stock" | "coming_soon" | "hidden";
+  stock?: number;
 }
 
 export type ProductRow = {
@@ -25,7 +27,8 @@ export type ProductRow = {
   occasion: string | null;
   contents: string[] | null;
   imageUrl: string | null;
-  active: boolean;
+  availability: string;
+  stock: number;
 };
 
 export function rowToProduct(p: ProductRow): CatalogProduct {
@@ -41,5 +44,7 @@ export function rowToProduct(p: ProductRow): CatalogProduct {
     ...(p.occasion ? { occasion: p.occasion } : {}),
     ...(p.contents ? { contents: p.contents } : {}),
     ...(p.imageUrl ? { image: p.imageUrl } : {}),
+    availability: (p.availability as CatalogProduct["availability"]) ?? "available",
+    stock: p.stock ?? 0,
   };
 }

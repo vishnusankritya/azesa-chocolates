@@ -25,6 +25,12 @@ const STATUS_LABEL: Record<string, string> = {
   fulfilled: "Fulfilled",
   cancelled: "Cancelled",
 };
+const AVAIL_LABEL: Record<string, string> = {
+  available: "Available",
+  out_of_stock: "Out of stock",
+  coming_soon: "Coming soon",
+  hidden: "Hidden",
+};
 
 function fmtDate(iso: string) {
   try {
@@ -215,7 +221,9 @@ export default function AdminDashboard() {
                   <p className="font-heading truncate text-brand-dark">{p.name}</p>
                   <p className="text-xs font-semibold uppercase tracking-wide text-brand-dark/45">
                     {p.type} · ₹{p.price}
-                    {p.active === false ? " · hidden" : ""}
+                    {p.availability !== "available" ? ` · ${AVAIL_LABEL[p.availability] ?? p.availability}` : ""}
+                    {" · "}
+                    {p.stock > 0 ? `${p.stock} in stock` : "0 stock"}
                     {p.images?.length ? ` · ${p.images.length} img` : ""}
                   </p>
                 </div>

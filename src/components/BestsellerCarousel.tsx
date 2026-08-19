@@ -72,6 +72,7 @@ export default function BestsellerCarousel({ products }: { products: CatalogProd
                               id={product.id}
                               label="Add to Cart"
                               compact
+                              availability={product.availability}
                               className="absolute left-1/2 -translate-x-1/2 bottom-[56px] z-10 whitespace-nowrap opacity-0 translate-y-1 pointer-events-none transition-all duration-200 group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto"
                             />
             </div>

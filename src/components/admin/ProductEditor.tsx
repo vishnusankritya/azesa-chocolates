@@ -17,8 +17,16 @@ export type AdminProduct = {
   contents: string[] | null;
   imageUrl: string | null;
   images: string[] | null;
-  active: boolean;
+  availability: string;
+  stock: number;
 };
+
+const AVAILABILITY = [
+  ["available", "Available"],
+  ["out_of_stock", "Out of stock"],
+  ["coming_soon", "Coming soon"],
+  ["hidden", "Hidden"],
+] as const;
 
 const TYPES = [
   ["chocolate", "Chocolate"],
@@ -31,33 +39,6 @@ const inputCls =
   "w-full rounded-xl border-2 border-brand-dark/20 bg-white px-3 py-2 text-sm text-brand-dark focus:border-brand-dark focus:outline-none";
 
 const labelCls = "mb-1 block font-heading text-[11px] font-black uppercase tracking-wide text-brand-dark/60";
-
-function Toggle({
-  on,
-  onChange,
-  label,
-}: {
-  on: boolean;
-  onChange: (v: boolean) => void;
-  label: string;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={() => onChange(!on)}
-      className={`flex cursor-pointer items-center gap-2 rounded-full border-2 px-3 py-1.5 font-heading text-xs font-black uppercase tracking-wide transition-colors ${
-        on
-          ? "border-brand-dark bg-brand-dark text-brand-cream"
-          : "border-brand-dark/25 bg-white text-brand-dark/50"
-      }`}
-    >
-      <span
-        className={`h-2 w-2 rounded-full ${on ? "bg-brand-orange" : "bg-neutral-300"}`}
-      />
-      {label}
-    </button>
-  );
-}
 
 interface Props {
   product: AdminProduct | null; // null => create new
@@ -78,7 +59,8 @@ export default function ProductEditor({ product, onSaved, onClose }: Props) {
     description: product?.description ?? "",
     occasion: product?.occasion ?? "",
     contents: (product?.contents ?? []).join(", "),
-    active: product?.active ?? true,
+    availability: product?.availability ?? "available",
+    stock: product?.stock?.toString() ?? "0",
   });
   const [images, setImages] = useState<string[]>(product?.images ?? (product?.imageUrl ? [product.imageUrl] : []));
   const [newUrl, setNewUrl] = useState("");
@@ -138,7 +120,8 @@ export default function ProductEditor({ product, onSaved, onClose }: Props) {
         : null,
       imageUrl,
       images: images.length ? images : null,
-      active: f.active,
+      availability: f.availability,
+      stock: Number(f.stock) || 0,
     };
     const isNew = !product;
     const url = isNew ? "/api/admin/products" : `/api/admin/products/${product.slug}`;
@@ -199,9 +182,15 @@ export default function ProductEditor({ product, onSaved, onClose }: Props) {
           </div>
           <div>
             <label className={labelCls}>Availability</label>
-            <div className="flex gap-2 pt-0.5">
-              <Toggle on={f.active} onChange={(v) => setF((p) => ({ ...p, active: v }))} label={f.active ? "Available" : "Hidden"} />
-            </div>
+            <select className={inputCls} value={f.availability} onChange={set("availability")}>
+              {AVAILABILITY.map(([v, l]) => (
+                <option key={v} value={v}>{l}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className={labelCls}>Stock count</label>
+            <input className={inputCls} value={f.stock} onChange={set("stock")} inputMode="numeric" placeholder="40" />
           </div>
           <div>
             <label className={labelCls}>Price (₹)</label>
