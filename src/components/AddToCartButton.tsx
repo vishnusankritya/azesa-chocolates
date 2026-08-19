@@ -40,51 +40,56 @@ export default function AddToCartButton({
   const item = items.find((i) => i.id === id);
 
   if (compact) {
-    const container = `flex items-center gap-1 rounded-full border-2 border-brand-dark bg-brand-cream px-1.5 py-1 font-heading text-[10px] uppercase tracking-wide shadow-[2px_2px_0_0_#1c1109] whitespace-nowrap ${className}`;
-
     if (!item) {
-      // Compact card CTA: a small round cart-icon link that routes to the cart
-      // (no add-from-card action). Once the product is in the cart the card
-      // swaps to the −/qty/+ item counter below.
+      // "Add to Cart" pill revealed on card hover (desktop); always visible on
+      // mobile (no hover). Clicking adds the item to the cart.
       return (
-        <Link
-          href="/cart"
-          aria-label="View cart"
-          className="inline-flex cursor-pointer items-center justify-center rounded-full border-2 border-brand-dark bg-brand-cream p-2 text-brand-dark shadow-[2px_2px_0_0_#1c1109] transition-colors hover:bg-brand-dark hover:text-brand-cream"
+        <button
+          type="button"
+          onClick={() => add(id)}
+          className={`${className} inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-full border-2 border-brand-dark bg-brand-cream px-3.5 py-2 font-heading text-[11px] font-black uppercase tracking-wide text-brand-dark shadow-[2px_2px_0_0_#1c1109] transition-all duration-200 hover:bg-brand-dark hover:text-brand-cream md:pointer-events-none md:translate-y-1 md:opacity-0 md:group-hover:pointer-events-auto md:group-hover:translate-y-0 md:group-hover:opacity-100`}
         >
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-            <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
-            <line x1="3" y1="6" x2="21" y2="6" />
-            <path d="M16 10a4 4 0 0 1-8 0" />
-          </svg>
-        </Link>
+          {label}
+        </button>
       );
     }
 
-    // In-cart compact state: a clean, centered − / qty / + stepper on the card.
-    // (The "Go to Cart" pill lives on the product page / cart, not the card —
-    // it crowded the narrow card against the tiny round buttons.)
+    // In-cart compact state: a − / qty / + item counter with a cart icon button
+    // beside it that routes to the cart.
+    const stepBtn =
+      "flex h-7 w-7 cursor-pointer items-center justify-center rounded-full font-heading text-lg font-black leading-none text-brand-dark transition-colors hover:bg-brand-dark hover:text-brand-cream";
     return (
-      <div className="inline-flex items-center justify-center gap-2 rounded-full border-2 border-brand-dark bg-brand-cream px-1.5 py-1 shadow-[2px_2px_0_0_#1c1109]">
+      <div className={`${className} inline-flex items-center gap-1 rounded-full border-2 border-brand-dark bg-brand-cream p-1 font-heading text-[10px] uppercase tracking-wide shadow-[2px_2px_0_0_#1c1109]`}>
         <button
           type="button"
           aria-label="Decrease quantity"
           onClick={() => setQty(id, item.qty - 1)}
-          className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full font-heading text-lg font-black leading-none text-brand-dark transition-colors hover:bg-brand-dark hover:text-brand-cream"
+          className={stepBtn}
         >
           −
         </button>
-        <span className="w-8 text-center font-heading text-base font-black text-brand-dark">
+        <span aria-live="polite" className="w-7 text-center font-heading text-base font-black text-brand-dark">
           {item.qty}
         </span>
         <button
           type="button"
           aria-label="Increase quantity"
           onClick={() => add(id)}
-          className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full font-heading text-lg font-black leading-none text-brand-dark transition-colors hover:bg-brand-dark hover:text-brand-cream"
+          className={stepBtn}
         >
           +
         </button>
+        <Link
+          href="/cart"
+          aria-label="View cart"
+          className="ml-1 flex h-7 w-7 cursor-pointer items-center justify-center rounded-full border-2 border-brand-dark text-brand-dark transition-colors hover:bg-brand-dark hover:text-brand-cream"
+        >
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+            <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <path d="M16 10a4 4 0 0 1-8 0" />
+          </svg>
+        </Link>
       </div>
     );
   }
