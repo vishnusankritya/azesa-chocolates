@@ -140,6 +140,25 @@ export default function ProductEditor({ product, onSaved, onClose }: Props) {
     }
   };
 
+  const del = async () => {
+    if (!product) return;
+    if (!window.confirm(`Delete "${product.name}" permanently? This cannot be undone.`)) return;
+    setBusy(true);
+    setError(null);
+    try {
+      const res = await fetch(`/api/admin/products/${product.slug}`, { method: "DELETE" });
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({}));
+        throw new Error(d?.error || "Delete failed");
+      }
+      onSaved();
+      onClose();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Delete failed");
+      setBusy(false);
+    }
+  };
+
   return (
     <div
       className="fixed inset-0 z-[120] grid place-items-start overflow-y-auto bg-[#1c1109]/60 p-4 backdrop-blur-sm md:place-items-center"
@@ -264,13 +283,27 @@ export default function ProductEditor({ product, onSaved, onClose }: Props) {
           <p className="mt-4 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-700">{error}</p>
         )}
 
-        <div className="mt-6 flex items-center justify-end gap-3">
-          <button type="button" onClick={onClose} disabled={busy} className="cursor-pointer rounded-full border-2 border-brand-dark px-5 py-2 font-heading text-sm uppercase tracking-wide text-brand-dark transition-colors hover:bg-brand-dark hover:text-brand-cream disabled:opacity-50">
-            Cancel
-          </button>
-          <button type="button" onClick={save} disabled={busy} className="cursor-pointer rounded-full border-2 border-brand-dark bg-brand-dark px-6 py-2 font-heading text-sm font-black uppercase tracking-wide text-brand-cream shadow-[3px_3px_0_0_#1c1109] transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none disabled:opacity-60">
-            {busy ? "Saving…" : "Save product"}
-          </button>
+        <div className="mt-6 flex items-center justify-between gap-3">
+          {product ? (
+            <button
+              type="button"
+              onClick={del}
+              disabled={busy}
+              className="cursor-pointer rounded-full border-2 border-red-700 px-5 py-2 font-heading text-sm uppercase tracking-wide text-red-700 transition-colors hover:bg-red-700 hover:text-white disabled:opacity-50"
+            >
+              {busy ? "Deleting…" : "Delete product"}
+            </button>
+          ) : (
+            <span />
+          )}
+          <div className="flex items-center gap-3">
+            <button type="button" onClick={onClose} disabled={busy} className="cursor-pointer rounded-full border-2 border-brand-dark px-5 py-2 font-heading text-sm uppercase tracking-wide text-brand-dark transition-colors hover:bg-brand-dark hover:text-brand-cream disabled:opacity-50">
+              Cancel
+            </button>
+            <button type="button" onClick={save} disabled={busy} className="cursor-pointer rounded-full border-2 border-brand-dark bg-brand-dark px-6 py-2 font-heading text-sm font-black uppercase tracking-wide text-brand-cream shadow-[3px_3px_0_0_#1c1109] transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none disabled:opacity-60">
+              {busy ? "Saving…" : "Save product"}
+            </button>
+          </div>
         </div>
       </div>
     </div>
