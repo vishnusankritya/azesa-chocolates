@@ -8,7 +8,7 @@ export async function POST() {
     { ok: true },
     {
       headers: {
-        "Set-Cookie": "azesa_session=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0",
+        "Set-Cookie": "azesa_session=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0",
       },
     }
   );

@@ -44,7 +44,7 @@ export async function POST(req: Request) {
     { ok: true },
     {
       headers: {
-        "Set-Cookie": `azesa_session=${encodeURIComponent(session)}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${60 * 60 * 24 * 7}`,
+        "Set-Cookie": `azesa_session=${encodeURIComponent(session)}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${60 * 60 * 24 * 7}`,
       },
     }
   );
