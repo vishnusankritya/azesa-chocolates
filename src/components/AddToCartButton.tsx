@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useCart } from "@/context/CartContext";
 import Button from "@/components/ui/Button";
 import QtyStepper from "@/components/QtyStepper";
@@ -34,37 +33,30 @@ export default function AddToCartButton({
       );
     }
 
-    // In-cart compact state: − / qty / + stepper plus a "Go to Cart" button.
+    // In-cart compact state: a clean, centered − / qty / + stepper on the card.
+    // (The "Go to Cart" pill lives on the product page / cart, not the card —
+    // it crowded the narrow card against the tiny round buttons.)
     return (
-      <div className={`flex items-center gap-1.5 ${className}`}>
+      <div className="inline-flex items-center justify-center gap-2 rounded-full border-2 border-brand-dark bg-brand-cream px-1.5 py-1 shadow-[2px_2px_0_0_#1c1109]">
         <button
           type="button"
           aria-label="Decrease quantity"
           onClick={() => setQty(id, item.qty - 1)}
-          className="flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-full border-2 border-brand-dark bg-brand-cream text-base font-black leading-none text-brand-dark shadow-[2px_2px_0_0_#1c1109] transition-colors hover:bg-brand-dark hover:text-brand-cream"
+          className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full font-heading text-lg font-black leading-none text-brand-dark transition-colors hover:bg-brand-dark hover:text-brand-cream"
         >
           −
         </button>
-        <span className="w-6 shrink-0 text-center font-heading text-sm font-black text-brand-dark">
+        <span className="w-8 text-center font-heading text-base font-black text-brand-dark">
           {item.qty}
         </span>
         <button
           type="button"
           aria-label="Increase quantity"
           onClick={() => add(id)}
-          className="flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-full border-2 border-brand-dark bg-brand-cream text-base font-black leading-none text-brand-dark shadow-[2px_2px_0_0_#1c1109] transition-colors hover:bg-brand-dark hover:text-brand-cream"
+          className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full font-heading text-lg font-black leading-none text-brand-dark transition-colors hover:bg-brand-dark hover:text-brand-cream"
         >
           +
         </button>
-        <Link
-          href="/cart"
-          className="flex items-center gap-1.5 whitespace-nowrap rounded-full border-2 border-brand-dark bg-brand-dark py-[5px] pl-1.5 pr-3 font-heading text-[11px] font-black uppercase tracking-wide text-brand-cream shadow-[2px_2px_0_0_#1c1109] transition-transform hover:-translate-y-0.5"
-        >
-          <span className="flex h-4 w-4 items-center justify-center rounded-full bg-brand-orange text-[10px] font-black text-brand-dark">
-            {item.qty}
-          </span>
-          <span>Go to Cart</span>
-        </Link>
       </div>
     );
   }
