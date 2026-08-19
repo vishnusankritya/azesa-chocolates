@@ -85,7 +85,7 @@ export async function POST(req: Request) {
   if (amount <= 0) return err(400, "Invalid order total");
 
   if (payment === "online" && !isRazorpayConfigured()) {
-    return err(503, "Online payment isn't enabled yet — please use Cash on Delivery.");
+    return err(503, "Online payment isn't enabled yet — please use UPI Scan & Pay.");
   }
 
   let result: { orderId: string; razorpayOrderId: string | null } | undefined;
@@ -158,7 +158,7 @@ export async function POST(req: Request) {
     } else {
       await tx.insert(paymentsTable).values({
         orderId: order.id,
-        status: payment === "cod" ? "cod_pending" : payment === "upi_qr" ? "upi_pending" : "created",
+        status: payment === "upi_qr" ? "upi_pending" : "created",
         amount,
       });
       result = { orderId: order.id, razorpayOrderId: null };

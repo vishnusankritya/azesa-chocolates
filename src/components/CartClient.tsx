@@ -27,7 +27,7 @@ export default function CartClient() {
     city: "",
     state: "",
     pincode: "",
-    payment: "upi_qr" as "upi_qr" | "cod",
+    payment: "upi_qr" as "upi_qr",
   });
 
   const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) =>
@@ -47,7 +47,7 @@ export default function CartClient() {
         state: form.state,
         pincode: form.pincode,
       },
-      payment: form.payment === "cod" ? "cod" : "upi_qr",
+      payment: form.payment,
     };
     try {
       const res = await fetch("/api/checkout", {
@@ -280,7 +280,7 @@ export default function CartClient() {
 
                 <div className="mt-6 rounded-2xl border border-brand-dark/15 bg-white p-4 text-left">
                   <div className="flex justify-between text-brand-dark/70"><span>Total</span><span className="font-heading text-brand-dark">₹{subtotal}</span></div>
-                  <div className="mt-1 flex justify-between text-brand-dark/70"><span>Payment</span><span className="font-heading uppercase text-brand-dark">{form.payment === "cod" ? "Cash on Delivery" : "UPI"}</span></div>
+                  <div className="mt-1 flex justify-between text-brand-dark/70"><span>Payment</span><span className="font-heading uppercase text-brand-dark">UPI</span></div>
                 </div>
                 <Button className="mt-7 w-full justify-center" onClick={handleDone}>
                   Done
@@ -328,37 +328,23 @@ export default function CartClient() {
 
                   <fieldset className="space-y-3">
                     <legend className="mb-1 font-heading text-sm font-black uppercase tracking-wide text-brand-dark">Payment</legend>
-                    <div className="grid grid-cols-2 gap-2">
-                      {([
-                        ["upi_qr", "UPI · Scan & Pay"],
-                        ["cod", "Cash on Delivery"],
-                      ] as const).map(([val, label]) => (
+                    <div className="grid gap-2 sm:grid-cols-2">
+                      {([["upi_qr", "UPI · Scan & Pay"]] as const).map(([val, label]) => (
                         <button
                           key={val}
                           type="button"
-                          onClick={() => setForm((f) => ({ ...f, payment: val }))}
-                          className={`cursor-pointer rounded-xl border-2 px-3 py-2 font-heading text-xs font-black uppercase tracking-wide transition-colors ${
-                            form.payment === val
-                              ? "border-brand-dark bg-brand-dark text-brand-cream"
-                              : "border-brand-dark/25 bg-white text-brand-dark hover:border-brand-dark"
-                          }`}
+                          disabled
+                          className={`cursor-pointer rounded-xl border-2 px-3 py-2 font-heading text-xs font-black uppercase tracking-wide transition-colors disabled:cursor-default border-brand-dark bg-brand-dark text-brand-cream`}
                         >
                           {label}
                         </button>
                       ))}
                     </div>
 
-                    {form.payment === "upi_qr" && (
-                      <p className="rounded-xl bg-white px-3 py-2 text-sm text-brand-dark/70">
-                        You&apos;ll get a UPI QR to scan and pay ₹{subtotal} after placing your order. We&apos;ll
-                        confirm on receipt.
-                      </p>
-                    )}
-                    {form.payment === "cod" && (
-                      <p className="rounded-xl bg-white px-3 py-2 text-sm text-brand-dark/70">
-                        Pay ₹{subtotal} when your order arrives. Small convenience fee may apply.
-                      </p>
-                    )}
+                    <p className="rounded-xl bg-white px-3 py-2 text-sm text-brand-dark/70">
+                      You&apos;ll get a UPI QR to scan and pay ₹{subtotal} after placing your order. We&apos;ll
+                      confirm on receipt.
+                    </p>
                   </fieldset>
 
                   <div className="my-4 h-px bg-brand-dark/15" />
@@ -381,7 +367,7 @@ export default function CartClient() {
                     {placing ? "Placing order…" : `Place order · ₹${subtotal}`}
                   </button>
                   <p className="text-center text-[11px] font-semibold text-brand-dark/45">
-                    Cash on Delivery creates a real order. Online payment (UPI/Card) goes live once Razorpay keys are connected.
+                    Pay by scanning the UPI QR after placing your order. Your order stays pending until we confirm the payment.
                   </p>
                 </form>
               </>
