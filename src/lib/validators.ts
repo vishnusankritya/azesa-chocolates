@@ -17,6 +17,7 @@ export const checkoutSchema = z.object({
   }),
   address: z.object({
     address: z.string().trim().min(1).max(300),
+    landmark: z.string().trim().max(200).optional(),
     city: z.string().trim().min(1).max(80),
     state: z.string().trim().min(1).max(80),
     pincode: z.string().trim().regex(/^\d{6}$/, "Invalid pincode (6 digits)"),

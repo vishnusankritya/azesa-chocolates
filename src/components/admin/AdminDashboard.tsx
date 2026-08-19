@@ -12,7 +12,7 @@ type Order = {
   paymentId: string | null;
   createdAt: string;
   customer: { name: string | null; phone: string | null; email: string | null } | null;
-  address: { line1: string; city: string; state: string; pincode: string } | null;
+  address: { line1: string; landmark?: string | null; city: string; state: string; pincode: string } | null;
   items: { productName: string; qty: number; unitPrice: number }[];
 };
 
@@ -173,7 +173,7 @@ export default function AdminDashboard() {
                 </div>
                 {o.address && (
                   <div className="rounded-xl bg-white p-3 text-sm text-brand-dark/70">
-                    {o.address.line1}, {o.address.city}, {o.address.state} — {o.address.pincode}
+                    {o.address.line1}{o.address.landmark ? `, ${o.address.landmark}` : ""}, {o.address.city}, {o.address.state} — {o.address.pincode}
                   </div>
                 )}
               </div>

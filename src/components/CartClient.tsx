@@ -23,6 +23,7 @@ export default function CartClient() {
     phone: "",
     email: "",
     address: "",
+    landmark: "",
     city: "",
     state: "",
     pincode: "",
@@ -41,6 +42,7 @@ export default function CartClient() {
       customer: { name: form.name, phone: form.phone, email: form.email || undefined },
       address: {
         address: form.address,
+        landmark: form.landmark,
         city: form.city,
         state: form.state,
         pincode: form.pincode,
@@ -70,7 +72,7 @@ export default function CartClient() {
     setPlaced(false);
     setOrderId(null);
     setUpiLink(null);
-    setForm((f) => ({ ...f, name: "", phone: "", email: "", address: "", city: "", state: "", pincode: "" }));
+    setForm((f) => ({ ...f, name: "", phone: "", email: "", address: "", landmark: "", city: "", state: "", pincode: "" }));
     clear();
   };
 
@@ -301,6 +303,7 @@ export default function CartClient() {
                   <fieldset className="space-y-3">
                     <legend className="mb-1 font-heading text-sm font-black uppercase tracking-wide text-brand-dark">Delivery address</legend>
                     <input required value={form.address} onChange={set("address")} placeholder="Flat / house no., street, area" className="input" />
+                    <input value={form.landmark} onChange={set("landmark")} placeholder="Landmark (optional)" className="input" />
                     <div className="grid gap-3 sm:grid-cols-3">
                       <input required value={form.city} onChange={set("city")} placeholder="City" className="input" />
                       <input required value={form.state} onChange={set("state")} placeholder="State" className="input" />

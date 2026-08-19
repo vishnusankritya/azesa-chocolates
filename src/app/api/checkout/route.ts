@@ -114,6 +114,7 @@ export async function POST(req: Request) {
       .values({
         customerId: cust.id,
         line1: address!.address!.trim(),
+        landmark: address!.landmark?.trim() || null,
         city: address!.city!.trim(),
         state: address!.state!.trim(),
         pincode: address!.pincode!.trim(),

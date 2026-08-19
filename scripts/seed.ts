@@ -48,6 +48,7 @@ CREATE TABLE IF NOT EXISTS addresses (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   customer_id uuid NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
   line1 text NOT NULL,
+  landmark text,
   city text NOT NULL,
   state text NOT NULL,
   pincode text NOT NULL,
