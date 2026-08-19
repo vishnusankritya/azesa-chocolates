@@ -6,6 +6,7 @@ import { useCart } from "@/context/CartContext";
 import { useProducts } from "@/lib/useProducts";
 import QtyStepper from "@/components/QtyStepper";
 import Button from "@/components/ui/Button";
+import UPIQr from "@/components/upi/UPIQr";
 
 export default function CartClient() {
   const { items, count, subtotal, add, setQty, remove, clear } = useCart();
@@ -16,6 +17,7 @@ export default function CartClient() {
   const [placing, setPlacing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [orderId, setOrderId] = useState<string | null>(null);
+  const [upiLink, setUpiLink] = useState<string | null>(null);
   const [form, setForm] = useState({
     name: "",
     phone: "",
@@ -24,11 +26,7 @@ export default function CartClient() {
     city: "",
     state: "",
     pincode: "",
-    payment: "upi" as "upi" | "card" | "cod",
-    upiId: "",
-    cardNumber: "",
-    cardExpiry: "",
-    cardCvv: "",
+    payment: "upi_qr" as "upi_qr" | "cod",
   });
 
   const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) =>
@@ -47,7 +45,7 @@ export default function CartClient() {
         state: form.state,
         pincode: form.pincode,
       },
-      payment: form.payment === "cod" ? "cod" : "online",
+      payment: form.payment === "cod" ? "cod" : "upi_qr",
     };
     try {
       const res = await fetch("/api/checkout", {
@@ -58,6 +56,7 @@ export default function CartClient() {
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || "We couldn't place your order. Please try again.");
       setOrderId(data.orderId);
+      setUpiLink(data.upiLink ?? null);
       setPlaced(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
@@ -70,6 +69,7 @@ export default function CartClient() {
     setCheckoutOpen(false);
     setPlaced(false);
     setOrderId(null);
+    setUpiLink(null);
     setForm((f) => ({ ...f, name: "", phone: "", email: "", address: "", city: "", state: "", pincode: "" }));
     clear();
   };
@@ -246,9 +246,24 @@ export default function CartClient() {
                   We&apos;ll deliver {count} {count === 1 ? "item" : "items"} to {form.address || "your address"}{" "}
                   {form.city ? `, ${form.city}` : ""}.
                 </p>
+
+                {form.payment === "upi_qr" && upiLink && orderId && (
+                  <div className="mt-6">
+                    <UPIQr
+                      amount={subtotal}
+                      orderRef={orderId.slice(0, 8).toUpperCase()}
+                      upiLink={upiLink}
+                    />
+                    <p className="mt-3 flex items-center justify-center gap-1.5 text-xs font-semibold text-brand-dark/55">
+                      <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-brand-orange" />
+                      Pay via any UPI app. Your order stays pending until we confirm the receipt.
+                    </p>
+                  </div>
+                )}
+
                 <div className="mt-6 rounded-2xl border border-brand-dark/15 bg-white p-4 text-left">
                   <div className="flex justify-between text-brand-dark/70"><span>Total</span><span className="font-heading text-brand-dark">₹{subtotal}</span></div>
-                  <div className="mt-1 flex justify-between text-brand-dark/70"><span>Payment</span><span className="font-heading uppercase text-brand-dark">{form.payment === "cod" ? "Cash on Delivery" : form.payment === "card" ? "Card" : "UPI"}</span></div>
+                  <div className="mt-1 flex justify-between text-brand-dark/70"><span>Payment</span><span className="font-heading uppercase text-brand-dark">{form.payment === "cod" ? "Cash on Delivery" : "UPI"}</span></div>
                 </div>
                 <Button className="mt-7 w-full justify-center" onClick={handleDone}>
                   Done
@@ -295,10 +310,9 @@ export default function CartClient() {
 
                   <fieldset className="space-y-3">
                     <legend className="mb-1 font-heading text-sm font-black uppercase tracking-wide text-brand-dark">Payment</legend>
-                    <div className="grid grid-cols-3 gap-2">
+                    <div className="grid grid-cols-2 gap-2">
                       {([
-                        ["upi", "UPI"],
-                        ["card", "Card"],
+                        ["upi_qr", "UPI · Scan & Pay"],
                         ["cod", "Cash on Delivery"],
                       ] as const).map(([val, label]) => (
                         <button
@@ -316,17 +330,11 @@ export default function CartClient() {
                       ))}
                     </div>
 
-                    {form.payment === "upi" && (
-                      <input value={form.upiId} onChange={set("upiId")} placeholder="UPI ID (e.g. name@upi)" className="input" />
-                    )}
-                    {form.payment === "card" && (
-                      <div className="space-y-3">
-                        <input value={form.cardNumber} onChange={set("cardNumber")} inputMode="numeric" placeholder="Card number" className="input" />
-                        <div className="grid grid-cols-2 gap-3">
-                          <input value={form.cardExpiry} onChange={set("cardExpiry")} placeholder="MM / YY" className="input" />
-                          <input value={form.cardCvv} onChange={set("cardCvv")} inputMode="numeric" placeholder="CVV" className="input" />
-                        </div>
-                      </div>
+                    {form.payment === "upi_qr" && (
+                      <p className="rounded-xl bg-white px-3 py-2 text-sm text-brand-dark/70">
+                        You&apos;ll get a UPI QR to scan and pay ₹{subtotal} after placing your order. We&apos;ll
+                        confirm on receipt.
+                      </p>
                     )}
                     {form.payment === "cod" && (
                       <p className="rounded-xl bg-white px-3 py-2 text-sm text-brand-dark/70">

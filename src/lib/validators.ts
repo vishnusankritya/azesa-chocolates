@@ -21,7 +21,7 @@ export const checkoutSchema = z.object({
     state: z.string().trim().min(1).max(80),
     pincode: z.string().trim().regex(/^\d{6}$/, "Invalid pincode (6 digits)"),
   }),
-  payment: z.enum(["cod", "online"]),
+  payment: z.enum(["cod", "online", "upi_qr"]),
 });
 
 export const loginSchema = z.object({

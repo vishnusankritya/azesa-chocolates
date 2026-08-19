@@ -155,7 +155,7 @@ export default function AdminDashboard() {
                 <div className="text-right">
                   <p className="font-heading text-2xl font-black text-brand-dark">₹{o.amount}</p>
                   <p className="text-xs font-semibold uppercase tracking-wide text-brand-dark/50">
-                    {o.paymentMethod === "cod" ? "Cash on Delivery" : "Online"}
+                    {o.paymentMethod === "cod" ? "Cash on Delivery" : o.paymentMethod === "upi_qr" ? "UPI (Scan & Pay)" : "Online"}
                   </p>
                 </div>
               </div>

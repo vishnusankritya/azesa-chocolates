@@ -13,6 +13,7 @@ import { createRazorpayOrder, isRazorpayConfigured } from "@/lib/razorpay";
 import { isSameOrigin, rateLimit, clientIp } from "@/lib/security";
 import { checkoutSchema } from "@/lib/validators";
 import { serial } from "@/db/mutex";
+import { buildUpiLink } from "@/lib/upi";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -156,7 +157,7 @@ export async function POST(req: Request) {
     } else {
       await tx.insert(paymentsTable).values({
         orderId: order.id,
-        status: payment === "cod" ? "cod_pending" : "created",
+        status: payment === "cod" ? "cod_pending" : payment === "upi_qr" ? "upi_pending" : "created",
         amount,
       });
       result = { orderId: order.id, razorpayOrderId: null };
@@ -171,6 +172,14 @@ export async function POST(req: Request) {
       paymentMethod: payment,
       razorpayOrderId: result!.razorpayOrderId,
       status: "pending",
+      ...(payment === "upi_qr"
+        ? {
+            upiLink: buildUpiLink({
+              amount,
+              note: `Order ${result!.orderId.slice(0, 8).toUpperCase()}`,
+            }),
+          }
+        : {}),
     },
     { status: 201 }
   );
