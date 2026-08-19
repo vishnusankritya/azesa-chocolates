@@ -244,10 +244,25 @@ export default function CartClient() {
                 <p className="mt-3 text-brand-dark/70">
                   Thank you, {form.name || "chocolate lover"}. A confirmation has been sent to{" "}
                   <span className="font-semibold text-brand-dark">{form.phone || form.email || "your contact"}</span>.
-                  <br />
-                  We&apos;ll deliver {count} {count === 1 ? "item" : "items"} to {form.address || "your address"}{" "}
-                  {form.city ? `, ${form.city}` : ""}.
                 </p>
+                <div className="mt-2 flex items-center justify-center gap-2 text-brand-dark/70">
+                  <span>
+                    We&apos;ll deliver{" "}
+                    <b className="font-semibold text-brand-dark">{count} {count === 1 ? "item" : "items"}</b> to{" "}
+                    {form.address || "your address"} {form.city ? `, ${form.city}` : ""}.
+                  </span>
+                  <Link
+                    href="/cart"
+                    aria-label="View cart"
+                    className="inline-flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-full border-2 border-brand-dark text-brand-dark transition-colors hover:bg-brand-dark hover:text-brand-cream"
+                  >
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                      <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+                      <line x1="3" y1="6" x2="21" y2="6" />
+                      <path d="M16 10a4 4 0 0 1-8 0" />
+                    </svg>
+                  </Link>
+                </div>
 
                 {form.payment === "upi_qr" && upiLink && orderId && (
                   <div className="mt-6">
