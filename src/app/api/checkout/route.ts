@@ -177,7 +177,11 @@ export async function POST(req: Request) {
         ? {
             upiLink: buildUpiLink({
               amount,
-              note: `Order ${result!.orderId.slice(0, 8).toUpperCase()}`,
+              note: `Order ${result!.orderId.slice(0, 8).toUpperCase()} · ${customer!.name
+                .trim()
+                .split(/\s+/)[0]} · ${lineItems
+                .map((li) => `${li.qty}x ${li.productName}`)
+                .join(", ")}`,
             }),
           }
         : {}),
