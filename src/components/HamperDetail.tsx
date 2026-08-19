@@ -1,13 +1,15 @@
 import Link from "next/link";
-import { products, type Product } from "@/data/products";
+import type { CatalogProduct } from "@/lib/catalog";
 import AddToCartButton from "@/components/AddToCartButton";
 import ProductCard from "@/components/ProductCard";
 
-export default function HamperDetail({ product }: { product: Product }) {
-  const related = [
-    ...products.filter((p) => p.id !== product.id && p.type === "hamper"),
-    ...products.filter((p) => p.id !== product.id && p.type !== "hamper"),
-  ].slice(0, 4);
+export default function HamperDetail({
+  product,
+  related,
+}: {
+  product: CatalogProduct;
+  related: CatalogProduct[];
+}) {
 
   return (
     <section className="bg-white py-12 md:py-16">
@@ -47,6 +49,10 @@ export default function HamperDetail({ product }: { product: Product }) {
             </h1>
             <p className="mt-3 font-script text-2xl text-brand-orange">{product.tagline}</p>
 
+            {product.description && (
+              <p className="mt-3 max-w-md text-brand-dark/70">{product.description}</p>
+            )}
+
             <div className="mt-5 flex items-end gap-3">
               <span className="font-heading text-4xl font-black text-brand-dark">₹{product.price}</span>
               {product.mrp ? (
@@ -84,7 +90,7 @@ export default function HamperDetail({ product }: { product: Product }) {
             ) : null}
 
             <div className="mt-8 flex flex-wrap items-center gap-4">
-              <AddToCartButton id={product.id} />
+              <AddToCartButton id={product.id} availability={product.availability} />
               <div className="flex flex-wrap gap-x-5 gap-y-2">
                 {["No Palm Oil", "No Artificial Colours", "Made in India"].map((b) => (
                   <span key={b} className="flex items-center gap-1.5 text-sm font-bold text-brand-dark/55">

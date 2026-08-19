@@ -1,4 +1,4 @@
-import { products } from "@/data/products";
+import type { CatalogProduct } from "@/lib/catalog";
 import ProductCard from "@/components/ProductCard";
 import Button from "@/components/ui/Button";
 
@@ -11,10 +11,10 @@ const GRID_IDS = [
   "harry-potter-coffee",
 ];
 
-export default function ProductsGrid() {
-  const gridProducts = GRID_IDS
-    .map((id) => products.find((p) => p.id === id))
-    .filter((p): p is NonNullable<typeof p> => Boolean(p));
+export default function ProductsGrid({ products }: { products: CatalogProduct[] }) {
+  const gridProducts = GRID_IDS.map((id) => products.find((p) => p.id === id)).filter(
+    (p): p is NonNullable<typeof p> => Boolean(p)
+  );
 
   return (
     <section className="bg-white py-16 md:py-20">

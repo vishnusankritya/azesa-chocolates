@@ -65,7 +65,7 @@ export default function FeaturedSpotlight() {
 
           <div className={jitterClass("mt-6")} style={{ width: 220, height: 240 }}>
             <Link href={`/shop/${centre.id}`} className="block h-full w-full">
-              <img src={centre.src} alt={centre.label} className={IMG_HOVER} />
+              <img src={centre.src} alt={centre.label} loading="lazy" decoding="async" className={IMG_HOVER} />
             </Link>
           </div>
 
@@ -88,7 +88,7 @@ export default function FeaturedSpotlight() {
               className={jitterClass(`flex h-full w-full items-center justify-center ${CARD_HOVER}`)}
               style={{ ["--base-rot" as string]: left.rot }}
             >
-              <img src={left.src} alt={left.label} className={IMG_HOVER} />
+              <img src={left.src} alt={left.label} loading="lazy" decoding="async" className={IMG_HOVER} />
             </div>
           </Link>
 
@@ -108,7 +108,7 @@ export default function FeaturedSpotlight() {
               className={jitterClass(`flex h-full w-full items-center justify-center ${CARD_HOVER}`)}
               style={{ ["--base-rot" as string]: right.rot }}
             >
-              <img src={right.src} alt={right.label} className={IMG_HOVER} />
+              <img src={right.src} alt={right.label} loading="lazy" decoding="async" className={IMG_HOVER} />
             </div>
           </Link>
 
@@ -159,7 +159,7 @@ export default function FeaturedSpotlight() {
               className={jitterClass(`flex h-full w-full items-center justify-center ${CARD_HOVER}`)}
               style={{ ["--base-rot" as string]: centre.rot }}
             >
-              <img src={centre.src} alt={centre.label} className={IMG_HOVER} />
+              <img src={centre.src} alt={centre.label} loading="lazy" decoding="async" className={IMG_HOVER} />
             </div>
           </Link>
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { products } from "@/data/products";
+import type { CatalogProduct } from "@/lib/catalog";
 import ProductCard from "@/components/ProductCard";
 import Button from "@/components/ui/Button";
 
@@ -22,7 +22,13 @@ const PINATA_IDS = ["cookie-pinata", "biscoff", "kunafa-pinata"];
 
 const BESTSELLER_IDS = ["biscoff", "cookie-pinata", "mango", "choc-chip", "cookie-cream", "holi-edition-white"];
 
-export default function ShopClient({ initialCategory = "all" }: { initialCategory?: string }) {
+export default function ShopClient({
+  products,
+  initialCategory = "all",
+}: {
+  products: CatalogProduct[];
+  initialCategory?: string;
+}) {
   const [filter, setFilter] = useState<Filter>(
     initialCategory === "cookies"
       ? "cookie"

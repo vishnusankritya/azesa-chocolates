@@ -154,6 +154,18 @@ export const products: Product[] = [
       image: "/products/holi-edition-white.png",
     },
     {
+      id: "thandai",
+      name: "Thandai Bar",
+      price: 349,
+      mrp: 399,
+      type: "chocolate",
+      accentColor: "#d97706",
+      ingredient: "Thandai-scented dark chocolate, saffron, almonds & cardamom",
+      tagline: "Festive thandai, melted into a bar.",
+      occasion:
+        "Holi — the festival of colour. A nutty, aromatic bar inspired by the classic thandai drink.",
+    },
+    {
       id: "rakhi-chaos-hamper",
       name: "Ultimate Rakhi Chaos Hamper",
       price: 649,

@@ -1,11 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { products } from "@/data/products";
+import type { CatalogProduct } from "@/lib/catalog";
 import Button from "@/components/ui/Button";
 import AddToCartButton from "@/components/AddToCartButton";
 
-export default function BestsellerCarousel() {
+export default function BestsellerCarousel({ products }: { products: CatalogProduct[] }) {
   return (
     <section className="pt-2 pb-8 bg-brand-cream">
       <div className="max-w-7xl mx-auto px-6">
@@ -42,6 +42,8 @@ export default function BestsellerCarousel() {
                                     <img
                                       src={product.image}
                                       alt={product.name}
+                                      loading="lazy"
+                                      decoding="async"
                                       className="w-full h-full object-contain p-2 transition-transform duration-200 group-hover:scale-110 md:p-3"
                                     />
                                   ) : (
@@ -70,7 +72,8 @@ export default function BestsellerCarousel() {
                               id={product.id}
                               label="Add to Cart"
                               compact
-                              className="absolute left-1/2 -translate-x-1/2 bottom-[56px] z-10 whitespace-nowrap opacity-0 translate-y-1 pointer-events-none transition-all duration-200 group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto"
+                              availability={product.availability}
+                              className="absolute left-1/2 -translate-x-1/2 bottom-[56px] z-10 whitespace-nowrap"
                             />
             </div>
           ))}

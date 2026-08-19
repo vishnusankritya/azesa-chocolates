@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { products } from "@/data/products";
+import { getProducts, getProductBySlug } from "@/server/catalog";
 import AnnouncementBar from "@/components/AnnouncementBar";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
@@ -8,25 +8,34 @@ import AddToCartButton from "@/components/AddToCartButton";
 import Button from "@/components/ui/Button";
 import HamperDetail from "@/components/HamperDetail";
 
-export function generateStaticParams() {
-  return products.map((p) => ({ id: p.id }));
+export const revalidate = 300; // ISR product detail
+
+export async function generateStaticParams() {
+  const list = await getProducts();
+  return list.map((p) => ({ id: p.id }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const product = products.find((p) => p.id === id);
+  const product = await getProductBySlug(id);
   return {
     title: product ? `${product.name} — Azesa Chocolates` : "Not Found — Azesa Chocolates",
     description: product
-      ? `${product.name}: ${product.tagline} Real ${product.ingredient}. Handcrafted in Katihar, Bihar. No palm oil, no artificial colours.`
+      ? `${product.name}: ${product.tagline ?? ""} ${product.ingredient ?? ""}. Handcrafted in Katihar, Bihar. No palm oil, no artificial colours.`
       : undefined,
   };
 }
 
 export default async function ProductPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const product = products.find((p) => p.id === id);
+  const product = await getProductBySlug(id);
   if (!product) notFound();
+
+  const all = await getProducts();
+  const related = [
+    ...all.filter((p) => p.id !== product.id && p.type === product.type),
+    ...all.filter((p) => p.id !== product.id && p.type !== product.type),
+  ].slice(0, 4);
 
   if (product.type === "hamper") {
     return (
@@ -38,17 +47,12 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
           </div>
         </div>
         <main>
-          <HamperDetail product={product} />
+          <HamperDetail product={product} related={related} />
         </main>
         <Footer />
       </>
     );
   }
-
-  const related = [
-    ...products.filter((p) => p.id !== product.id && p.type === product.type),
-    ...products.filter((p) => p.id !== product.id && p.type !== product.type),
-  ].slice(0, 4);
 
   return (
     <>
@@ -90,12 +94,16 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
 
                 <p className="max-w-md text-brand-dark/70">
                   Every {product.name.toLowerCase()} is handcrafted in small batches in Katihar,
-                  Bihar — real {product.ingredient.toLowerCase()}, no palm oil, no artificial
-                  colours.
+                  Bihar — real {product.ingredient?.toLowerCase() ?? "chocolate"}, no palm oil, no
+                  artificial colours.
                 </p>
 
+                {product.description && (
+                  <p className="mt-4 max-w-md text-brand-dark/70">{product.description}</p>
+                )}
+
                 <div className="mt-8 flex flex-wrap items-center gap-4">
-                  <AddToCartButton id={product.id} label="Add to Cart" />
+                  <AddToCartButton id={product.id} label="Add to Cart" availability={product.availability} />
                   <div className="flex flex-wrap gap-x-5 gap-y-2">
                     {["No Palm Oil", "No Artificial Colours", "Made in India"].map((b) => (
                       <span

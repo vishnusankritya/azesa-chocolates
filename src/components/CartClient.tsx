@@ -3,42 +3,76 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useCart } from "@/context/CartContext";
-import { products } from "@/data/products";
+import { useProducts } from "@/lib/useProducts";
 import QtyStepper from "@/components/QtyStepper";
 import Button from "@/components/ui/Button";
+import UPIQr from "@/components/upi/UPIQr";
 
 export default function CartClient() {
   const { items, count, subtotal, add, setQty, remove, clear } = useCart();
+  const products = useProducts();
 
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [placed, setPlaced] = useState(false);
+  const [placing, setPlacing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [orderId, setOrderId] = useState<string | null>(null);
+  const [upiLink, setUpiLink] = useState<string | null>(null);
   const [form, setForm] = useState({
     name: "",
     phone: "",
     email: "",
     address: "",
+    landmark: "",
     city: "",
     state: "",
     pincode: "",
-    payment: "upi" as "upi" | "card" | "cod",
-    upiId: "",
-    cardNumber: "",
-    cardExpiry: "",
-    cardCvv: "",
+    payment: "upi_qr" as "upi_qr",
   });
 
   const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm((f) => ({ ...f, [k]: e.target.value }));
 
-  const handlePlaceOrder = (e: React.FormEvent) => {
+  const handlePlaceOrder = async (e: React.FormEvent) => {
     e.preventDefault();
-    setPlaced(true);
+    setPlacing(true);
+    setError(null);
+    const payload = {
+      items: items.map((i) => ({ productId: i.id, qty: i.qty })),
+      customer: { name: form.name, phone: form.phone, email: form.email || undefined },
+      address: {
+        address: form.address,
+        landmark: form.landmark,
+        city: form.city,
+        state: form.state,
+        pincode: form.pincode,
+      },
+      payment: form.payment,
+    };
+    try {
+      const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || "We couldn't place your order. Please try again.");
+      setOrderId(data.orderId);
+      setUpiLink(data.upiLink ?? null);
+      setPlaced(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
+    } finally {
+      setPlacing(false);
+    }
   };
 
   const handleDone = () => {
     setCheckoutOpen(false);
     setPlaced(false);
-    setForm((f) => ({ ...f, name: "", phone: "", email: "", address: "", city: "", state: "", pincode: "" }));
+    setOrderId(null);
+    setUpiLink(null);
+    setForm((f) => ({ ...f, name: "", phone: "", email: "", address: "", landmark: "", city: "", state: "", pincode: "" }));
     clear();
   };
 
@@ -108,6 +142,8 @@ export default function CartClient() {
                       <img
                         src={product.image}
                         alt={product.name}
+                        loading="lazy"
+                        decoding="async"
                         className="h-full w-full object-contain p-2"
                       />
                     )}
@@ -200,16 +236,51 @@ export default function CartClient() {
                   </svg>
                 </div>
                 <h2 className="mt-6 font-heading text-3xl font-black text-brand-dark">Order placed!</h2>
+                {orderId && (
+                  <p className="mt-2 inline-block rounded-full border border-brand-dark/20 bg-white px-4 py-1 font-heading text-xs font-black uppercase tracking-[0.15em] text-brand-dark">
+                    Order #{orderId.slice(0, 8).toUpperCase()}
+                  </p>
+                )}
                 <p className="mt-3 text-brand-dark/70">
                   Thank you, {form.name || "chocolate lover"}. A confirmation has been sent to{" "}
                   <span className="font-semibold text-brand-dark">{form.phone || form.email || "your contact"}</span>.
-                  <br />
-                  We&apos;ll deliver {count} {count === 1 ? "item" : "items"} to {form.address || "your address"}{" "}
-                  {form.city ? `, ${form.city}` : ""}.
                 </p>
+                <div className="mt-2 flex items-center justify-center gap-2 text-brand-dark/70">
+                  <span>
+                    We&apos;ll deliver{" "}
+                    <b className="font-semibold text-brand-dark">{count} {count === 1 ? "item" : "items"}</b> to{" "}
+                    {form.address || "your address"} {form.city ? `, ${form.city}` : ""}.
+                  </span>
+                  <Link
+                    href="/cart"
+                    aria-label="View cart"
+                    className="inline-flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-full border-2 border-brand-dark text-brand-dark transition-colors hover:bg-brand-dark hover:text-brand-cream"
+                  >
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                      <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+                      <line x1="3" y1="6" x2="21" y2="6" />
+                      <path d="M16 10a4 4 0 0 1-8 0" />
+                    </svg>
+                  </Link>
+                </div>
+
+                {form.payment === "upi_qr" && upiLink && orderId && (
+                  <div className="mt-6">
+                    <UPIQr
+                      amount={subtotal}
+                      orderRef={orderId.slice(0, 8).toUpperCase()}
+                      upiLink={upiLink}
+                    />
+                    <p className="mt-3 flex items-center justify-center gap-1.5 text-xs font-semibold text-brand-dark/55">
+                      <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-brand-orange" />
+                      Pay via any UPI app. Your order stays pending until we confirm the receipt.
+                    </p>
+                  </div>
+                )}
+
                 <div className="mt-6 rounded-2xl border border-brand-dark/15 bg-white p-4 text-left">
-                  <div className="flex justify-between text-brand-dark/70"><span>Total paid</span><span className="font-heading text-brand-dark">₹{subtotal}</span></div>
-                  <div className="mt-1 flex justify-between text-brand-dark/70"><span>Payment</span><span className="font-heading uppercase text-brand-dark">{form.payment === "cod" ? "Cash on Delivery" : form.payment === "card" ? "Card" : "UPI"}</span></div>
+                  <div className="flex justify-between text-brand-dark/70"><span>Total</span><span className="font-heading text-brand-dark">₹{subtotal}</span></div>
+                  <div className="mt-1 flex justify-between text-brand-dark/70"><span>Payment</span><span className="font-heading uppercase text-brand-dark">UPI</span></div>
                 </div>
                 <Button className="mt-7 w-full justify-center" onClick={handleDone}>
                   Done
@@ -247,6 +318,7 @@ export default function CartClient() {
                   <fieldset className="space-y-3">
                     <legend className="mb-1 font-heading text-sm font-black uppercase tracking-wide text-brand-dark">Delivery address</legend>
                     <input required value={form.address} onChange={set("address")} placeholder="Flat / house no., street, area" className="input" />
+                    <input value={form.landmark} onChange={set("landmark")} placeholder="Landmark (optional)" className="input" />
                     <div className="grid gap-3 sm:grid-cols-3">
                       <input required value={form.city} onChange={set("city")} placeholder="City" className="input" />
                       <input required value={form.state} onChange={set("state")} placeholder="State" className="input" />
@@ -256,44 +328,23 @@ export default function CartClient() {
 
                   <fieldset className="space-y-3">
                     <legend className="mb-1 font-heading text-sm font-black uppercase tracking-wide text-brand-dark">Payment</legend>
-                    <div className="grid grid-cols-3 gap-2">
-                      {([
-                        ["upi", "UPI"],
-                        ["card", "Card"],
-                        ["cod", "Cash on Delivery"],
-                      ] as const).map(([val, label]) => (
+                    <div className="grid gap-2 sm:grid-cols-2">
+                      {([["upi_qr", "UPI · Scan & Pay"]] as const).map(([val, label]) => (
                         <button
                           key={val}
                           type="button"
-                          onClick={() => setForm((f) => ({ ...f, payment: val }))}
-                          className={`cursor-pointer rounded-xl border-2 px-3 py-2 font-heading text-xs font-black uppercase tracking-wide transition-colors ${
-                            form.payment === val
-                              ? "border-brand-dark bg-brand-dark text-brand-cream"
-                              : "border-brand-dark/25 bg-white text-brand-dark hover:border-brand-dark"
-                          }`}
+                          disabled
+                          className={`cursor-pointer rounded-xl border-2 px-3 py-2 font-heading text-xs font-black uppercase tracking-wide transition-colors disabled:cursor-default border-brand-dark bg-brand-dark text-brand-cream`}
                         >
                           {label}
                         </button>
                       ))}
                     </div>
 
-                    {form.payment === "upi" && (
-                      <input value={form.upiId} onChange={set("upiId")} placeholder="UPI ID (e.g. name@upi)" className="input" />
-                    )}
-                    {form.payment === "card" && (
-                      <div className="space-y-3">
-                        <input value={form.cardNumber} onChange={set("cardNumber")} inputMode="numeric" placeholder="Card number" className="input" />
-                        <div className="grid grid-cols-2 gap-3">
-                          <input value={form.cardExpiry} onChange={set("cardExpiry")} placeholder="MM / YY" className="input" />
-                          <input value={form.cardCvv} onChange={set("cardCvv")} inputMode="numeric" placeholder="CVV" className="input" />
-                        </div>
-                      </div>
-                    )}
-                    {form.payment === "cod" && (
-                      <p className="rounded-xl bg-white px-3 py-2 text-sm text-brand-dark/70">
-                        Pay ₹{subtotal} when your order arrives. Small convenience fee may apply.
-                      </p>
-                    )}
+                    <p className="rounded-xl bg-white px-3 py-2 text-sm text-brand-dark/70">
+                      You&apos;ll get a UPI QR to scan and pay ₹{subtotal} after placing your order. We&apos;ll
+                      confirm on receipt.
+                    </p>
                   </fieldset>
 
                   <div className="my-4 h-px bg-brand-dark/15" />
@@ -302,14 +353,21 @@ export default function CartClient() {
                     <span className="font-heading text-2xl font-black text-brand-dark">₹{subtotal}</span>
                   </div>
 
+                  {error && (
+                    <p className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-700">
+                      {error}
+                    </p>
+                  )}
+
                   <button
                     type="submit"
-                    className="mt-4 w-full cursor-pointer rounded-full border-2 border-brand-dark bg-brand-cream px-6 py-3.5 font-heading text-base font-black uppercase tracking-wide text-brand-dark shadow-[3px_3px_0_0_#1c1109] transition-all duration-150 hover:translate-x-[3px] hover:translate-y-[3px] hover:bg-brand-dark hover:text-brand-cream hover:shadow-none"
+                    disabled={placing}
+                    className="mt-4 w-full cursor-pointer rounded-full border-2 border-brand-dark bg-brand-cream px-6 py-3.5 font-heading text-base font-black uppercase tracking-wide text-brand-dark shadow-[3px_3px_0_0_#1c1109] transition-all duration-150 hover:translate-x-[3px] hover:translate-y-[3px] hover:bg-brand-dark hover:text-brand-cream hover:shadow-none disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:bg-brand-cream disabled:hover:text-brand-dark disabled:hover:shadow-[3px_3px_0_0_#1c1109]"
                   >
-                    Place order · ₹{subtotal}
+                    {placing ? "Placing order…" : `Place order · ₹${subtotal}`}
                   </button>
                   <p className="text-center text-[11px] font-semibold text-brand-dark/45">
-                    Demo checkout — connect a payment gateway to go live. Nothing is charged.
+                    Pay by scanning the UPI QR after placing your order. Your order stays pending until we confirm the payment.
                   </p>
                 </form>
               </>

@@ -5,10 +5,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Button from "./ui/Button";
 import { useCart } from "@/context/CartContext";
-import { products } from "@/data/products";
+import { useProducts } from "@/lib/useProducts";
 
 const HAMPER_PAGE = "/shop/rakhi-chaos-hamper";
-const HAMPER = products.find((p) => p.id === "rakhi-chaos-hamper");
 
 const HAMper_POSTER =
   "https://lh3.googleusercontent.com/aida-public/AB6AXuBV4c5Fp5bV1QgRaL1hcZcZOfguwDrRuRI_MpS7YfFApCPvDi8JZ5G1KtpAOUJ_ajRQtyRrkb4gsFf3ySNo0aLuxYboKGNhgwMryllwNxPYAsJWe5O3DkcMYfw8CdT8laXiltRX9Xj1bkYzI8VVNan708JLiThk3dDsL2VGU8omj8MRCpUpjogOxUx_keqbo6SPLcdP3I5qKyogMxd1Lj-1R6M2R0G2KJFT1IwIOWj1g7Q9vr9Hh5mBdA";
@@ -22,6 +21,7 @@ export default function RakhiHamperHero() {
   const [quantity, setQuantity] = useState(1);
   const { add } = useCart();
   const router = useRouter();
+  const HAMPER = useProducts().find((p) => p.id === "rakhi-chaos-hamper");
 
   const handlePreOrder = () => {
     if (HAMPER) add(HAMPER.id, quantity);
