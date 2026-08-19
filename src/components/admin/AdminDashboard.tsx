@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import ProductEditor, { type AdminProduct } from "@/components/admin/ProductEditor";
 
@@ -18,13 +18,44 @@ type Order = {
 
 type Product = AdminProduct;
 
-const STATUSES = ["pending", "paid", "fulfilled", "cancelled"] as const;
 const STATUS_LABEL: Record<string, string> = {
   pending: "Pending",
   paid: "Paid",
+  packed: "Packed",
+  dispatched: "Dispatched",
   fulfilled: "Fulfilled",
   cancelled: "Cancelled",
 };
+const ORDER_TABS = [
+  { id: "pending", label: "Pending" },
+  { id: "paid", label: "Paid" },
+  { id: "fulfilled", label: "Delivered" },
+  { id: "cancelled", label: "Cancelled" },
+] as const;
+const PAID_SUB = [
+  { id: "all", label: "All" },
+  { id: "packed", label: "Packed" },
+  { id: "dispatched", label: "Dispatched" },
+] as const;
+// One-step status transitions for the workflow:
+// pending -> paid | cancelled -> packed -> dispatched -> fulfilled
+function actionsFor(status: string): [string, string, "default" | "danger" | "primary"][] {
+  switch (status) {
+    case "pending":
+      return [
+        ["paid", "Mark as Paid", "primary"],
+        ["cancelled", "Cancel Order", "danger"],
+      ];
+    case "paid":
+      return [["packed", "Mark as Packed", "default"]];
+    case "packed":
+      return [["dispatched", "Mark as Dispatched", "default"]];
+    case "dispatched":
+      return [["fulfilled", "Mark as Delivered", "primary"]];
+    default:
+      return [];
+  }
+}
 const AVAIL_LABEL: Record<string, string> = {
   available: "Available",
   out_of_stock: "Out of stock",
@@ -102,6 +133,37 @@ export default function AdminDashboard() {
     router.refresh();
   };
 
+  const [orderTab, setOrderTab] = useState<string>("pending");
+  const [paidSub, setPaidSub] = useState<string>("all");
+
+  const counts = useMemo(() => {
+    const c: Record<string, number> = { pending: 0, paid: 0, packed: 0, dispatched: 0, fulfilled: 0, cancelled: 0 };
+    orders?.forEach((o) => { c[o.status] = (c[o.status] || 0) + 1; });
+    return c;
+  }, [orders]);
+
+  const filteredOrders = useMemo(() => {
+    if (!orders) return [];
+    if (orderTab === "paid") {
+      if (paidSub === "packed") return orders.filter((o) => o.status === "packed");
+      if (paidSub === "dispatched") return orders.filter((o) => o.status === "dispatched");
+      return orders.filter((o) => o.status === "paid" || o.status === "packed" || o.status === "dispatched");
+    }
+    return orders.filter((o) => o.status === orderTab);
+  }, [orders, orderTab, paidSub]);
+
+  const pill = (active: boolean) =>
+    `cursor-pointer rounded-full border-2 px-4 py-2 font-heading text-sm font-black uppercase tracking-wide transition-colors ${
+      active ? "border-brand-dark bg-brand-dark text-brand-cream" : "border-brand-dark/30 bg-white text-brand-dark hover:border-brand-dark"
+    }`;
+
+  const actionBtn = (kind: string) =>
+    kind === "danger"
+      ? "cursor-pointer rounded-full border-2 border-red-700 px-3.5 py-1.5 font-heading text-xs font-black uppercase tracking-wide text-red-700 transition-colors hover:bg-red-700 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
+      : kind === "primary"
+        ? "cursor-pointer rounded-full border-2 border-brand-dark bg-brand-dark px-3.5 py-1.5 font-heading text-xs font-black uppercase tracking-wide text-brand-cream transition-colors hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+        : "cursor-pointer rounded-full border-2 border-brand-dark/40 bg-white px-3.5 py-1.5 font-heading text-xs font-black uppercase tracking-wide text-brand-dark transition-colors hover:border-brand-dark hover:bg-brand-cream disabled:cursor-not-allowed disabled:opacity-50";
+
   return (
     <div className="mx-auto max-w-6xl px-6 py-16 md:px-10">
       <div className="mb-10 flex items-start justify-between gap-4">
@@ -128,13 +190,37 @@ export default function AdminDashboard() {
 
       {!orders ? (
         <p className="text-brand-dark/55">Loading orders…</p>
-      ) : orders.length === 0 ? (
-        <p className="rounded-2xl border-2 border-dashed border-brand-dark/25 bg-[#fbf7ee] p-8 text-center text-brand-dark/55">
-          No orders yet.
-        </p>
       ) : (
-        <div className="flex flex-col gap-4">
-          {orders.map((o) => (
+        <>
+          <div className="mb-6 flex flex-wrap items-center gap-2">
+            {ORDER_TABS.map((tab) => {
+              const n = tab.id === "paid" ? counts.paid + counts.packed + counts.dispatched : counts[tab.id] || 0;
+              return (
+                <button key={tab.id} type="button" onClick={() => setOrderTab(tab.id)} className={pill(orderTab === tab.id)}>
+                  {tab.label}
+                  <span className={`ml-1.5 rounded-full px-1.5 py-0.5 text-[10px] ${orderTab === tab.id ? "bg-white/25" : "bg-brand-dark/10"}`}>{n}</span>
+                </button>
+              );
+            })}
+          </div>
+
+          {orderTab === "paid" && (
+            <div className="mb-6 flex flex-wrap items-center gap-2">
+              {PAID_SUB.map((s) => (
+                <button key={s.id} type="button" onClick={() => setPaidSub(s.id)} className={pill(paidSub === s.id)}>
+                  {s.label}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {filteredOrders.length === 0 ? (
+            <p className="rounded-2xl border-2 border-dashed border-brand-dark/25 bg-[#fbf7ee] p-8 text-center text-brand-dark/55">
+              {orderTab === "paid" ? "No paid orders here yet." : `No ${STATUS_LABEL[orderTab] ?? orderTab} orders here yet.`}
+            </p>
+          ) : (
+            <div className="flex flex-col gap-4">
+          {filteredOrders.map((o) => (
             <div key={o.id} className="rounded-2xl border-2 border-brand-dark bg-[#fbf7ee] p-5">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
@@ -178,25 +264,23 @@ export default function AdminDashboard() {
                 )}
               </div>
 
-              <div className="mt-4 flex flex-wrap gap-2">
-                {STATUSES.map((s) => (
-                  <button
-                    key={s}
-                    disabled={busy === o.id || s === o.status}
-                    onClick={() => setStatus(o.id, s)}
-                    className={`cursor-pointer rounded-full border-2 px-3.5 py-1.5 font-heading text-xs font-black uppercase tracking-wide transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
-                      s === o.status
-                        ? "border-brand-dark bg-brand-dark text-brand-cream"
-                        : "border-brand-dark/30 bg-white text-brand-dark hover:border-brand-dark"
-                    }`}
-                  >
-                    {s === o.status && busy === o.id ? "…" : STATUS_LABEL[s]}
+              <div className="mt-4 flex flex-wrap items-center gap-2">
+                {actionsFor(o.status).map(([s, label, kind]) => (
+                  <button key={s} type="button" disabled={busy === o.id} onClick={() => setStatus(o.id, s)} className={actionBtn(kind)}>
+                    {busy === o.id ? "…" : label}
                   </button>
                 ))}
+                {actionsFor(o.status).length === 0 && (
+                  <span className="rounded-full bg-white px-3.5 py-1.5 font-heading text-xs font-black uppercase tracking-wide text-brand-dark/50">
+                    ✓ {STATUS_LABEL[o.status]}
+                  </span>
+                )}
               </div>
             </div>
           ))}
-        </div>
+            </div>
+          )}
+        </>
       )}
 
       <div className="mt-14">

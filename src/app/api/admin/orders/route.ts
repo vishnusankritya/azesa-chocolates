@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { desc } from "drizzle-orm";
+import { asc } from "drizzle-orm";
 import { db } from "@/db";
 import { serial } from "@/db/mutex";
 import { orders, orderItems, customers, addresses } from "@/db/schema";
@@ -15,7 +15,7 @@ export async function GET(req: Request) {
 
   // PGlite is single-connection WASM — serialize the whole fetch as one unit.
   const [orderRows, items, custs, addrs] = await serial(async () => {
-    const o = await db.select().from(orders).orderBy(desc(orders.createdAt));
+    const o = await db.select().from(orders).orderBy(asc(orders.createdAt));
     const i = await db.select().from(orderItems);
     const c = await db.select().from(customers);
     const a = await db.select().from(addresses);

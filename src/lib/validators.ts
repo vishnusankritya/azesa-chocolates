@@ -31,7 +31,7 @@ export const loginSchema = z.object({
 });
 
 export const orderStatusSchema = z.object({
-  status: z.enum(["pending", "paid", "fulfilled", "cancelled"]),
+  status: z.enum(["pending", "paid", "packed", "dispatched", "fulfilled", "cancelled"]),
 });
 
 export const createProductSchema = z.object({
