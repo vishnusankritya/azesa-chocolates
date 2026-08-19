@@ -15,9 +15,11 @@ CREATE TABLE IF NOT EXISTS products (
   accent_color text,
   ingredient text,
   tagline text,
+  description text,
   occasion text,
   contents jsonb,
   image_url text,
+  images jsonb,
   active boolean NOT NULL DEFAULT true,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now()
@@ -95,7 +97,7 @@ async function main() {
   for (const p of catalog) {
     await db.execute(
       sql.raw(`
-        INSERT INTO products (slug, name, type, price, mrp, accent_color, ingredient, tagline, occasion, contents, image_url)
+        INSERT INTO products (slug, name, type, price, mrp, accent_color, ingredient, tagline, description, occasion, contents, image_url, images)
         VALUES (
           '${p.id.toLowerCase().replace(/['"\\]/g, "")}',
           '${p.name.replace(/'/g, "''")}',
@@ -105,16 +107,19 @@ async function main() {
           '${p.accentColor}',
           '${(p.ingredient ?? "").replace(/'/g, "''")}',
           '${(p.tagline ?? "").replace(/'/g, "''")}',
+          '${(p.tagline ?? "").replace(/'/g, "''")}',
           '${(p.occasion ?? "").replace(/'/g, "''")}',
           ${p.contents ? `'${JSON.stringify(p.contents).replace(/'/g, "''")}'::jsonb` : "NULL"},
-          '${p.image ?? ""}'
+          '${p.image ?? ""}',
+          '${JSON.stringify(p.image ? [p.image] : []).replace(/'/g, "''")}'::jsonb
         )
         ON CONFLICT (slug) DO UPDATE SET
           name = EXCLUDED.name, type = EXCLUDED.type, price = EXCLUDED.price,
           mrp = EXCLUDED.mrp, accent_color = EXCLUDED.accent_color,
           ingredient = EXCLUDED.ingredient, tagline = EXCLUDED.tagline,
-          occasion = EXCLUDED.occasion, contents = EXCLUDED.contents,
-          image_url = EXCLUDED.image_url
+          description = EXCLUDED.description, occasion = EXCLUDED.occasion,
+          contents = EXCLUDED.contents, image_url = EXCLUDED.image_url,
+          images = EXCLUDED.images
       `)
     );
   }

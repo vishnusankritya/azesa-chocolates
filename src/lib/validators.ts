@@ -38,13 +38,15 @@ export const createProductSchema = z.object({
   name: z.string().trim().min(1).max(160),
   type: z.string().min(1).max(40),
   price: z.number().int().min(0),
-  mrp: z.number().int().min(0).optional(),
-  accentColor: z.string().max(20).optional(),
+  mrp: z.number().int().min(0).nullable().optional(),
+  accentColor: z.string().max(20).nullable().optional(),
   ingredient: z.string().max(160).nullable().optional(),
   tagline: z.string().max(200).nullable().optional(),
+  description: z.string().max(2000).nullable().optional(),
   occasion: z.string().max(120).nullable().optional(),
   contents: z.array(z.string()).max(50).nullable().optional(),
   imageUrl: z.string().max(500).nullable().optional(),
+  images: z.array(z.string().max(500)).max(20).nullable().optional(),
   active: z.boolean().optional(),
 });
 

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import ProductEditor, { type AdminProduct } from "@/components/admin/ProductEditor";
 
 type Order = {
   id: string;
@@ -15,14 +16,7 @@ type Order = {
   items: { productName: string; qty: number; unitPrice: number }[];
 };
 
-type Product = {
-  id: string;
-  slug: string;
-  name: string;
-  type: string;
-  price: number;
-  active: boolean | null;
-};
+type Product = AdminProduct;
 
 const STATUSES = ["pending", "paid", "fulfilled", "cancelled"] as const;
 const STATUS_LABEL: Record<string, string> = {
@@ -51,6 +45,8 @@ export default function AdminDashboard() {
   const [products, setProducts] = useState<Product[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
+  const [editor, setEditor] = useState<AdminProduct | null>(null);
+  const [adding, setAdding] = useState(false);
 
   const load = async () => {
     try {
@@ -198,22 +194,38 @@ export default function AdminDashboard() {
       )}
 
       <div className="mt-14">
-        <h2 className="font-heading text-2xl font-black text-brand-dark">Products</h2>
+        <div className="mb-4 flex items-center justify-between gap-3">
+          <h2 className="font-heading text-2xl font-black text-brand-dark">Products</h2>
+          <button
+            type="button"
+            onClick={() => setAdding(true)}
+            className="cursor-pointer rounded-full border-2 border-brand-dark bg-brand-dark px-4 py-2 font-heading text-xs font-black uppercase tracking-wide text-brand-cream shadow-[2px_2px_0_0_#1c1109] transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
+          >
+            + Add product
+          </button>
+        </div>
         {products ? (
           <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {products.map((p) => (
               <div
                 key={p.id}
-                className="flex items-center justify-between rounded-2xl border-2 border-brand-dark/20 bg-[#fbf7ee] px-4 py-3"
+                className="flex items-center justify-between gap-2 rounded-2xl border-2 border-brand-dark/20 bg-[#fbf7ee] px-4 py-3"
               >
-                <div>
-                  <p className="font-heading text-brand-dark">{p.name}</p>
+                <div className="min-w-0">
+                  <p className="font-heading truncate text-brand-dark">{p.name}</p>
                   <p className="text-xs font-semibold uppercase tracking-wide text-brand-dark/45">
                     {p.type} · ₹{p.price}
                     {p.active === false ? " · hidden" : ""}
+                    {p.images?.length ? ` · ${p.images.length} img` : ""}
                   </p>
                 </div>
-                <span className="font-heading text-xs uppercase tracking-wide text-brand-dark/50">{p.slug}</span>
+                <button
+                  type="button"
+                  onClick={() => setEditor(p)}
+                  className="shrink-0 cursor-pointer rounded-full border-2 border-brand-dark px-3.5 py-1.5 font-heading text-xs font-black uppercase tracking-wide text-brand-dark transition-colors hover:bg-brand-dark hover:text-brand-cream"
+                >
+                  Edit
+                </button>
               </div>
             ))}
           </div>
@@ -221,6 +233,21 @@ export default function AdminDashboard() {
           <p className="mt-4 text-brand-dark/55">Loading products…</p>
         )}
       </div>
+
+      {(editor || adding) && (
+        <ProductEditor
+          product={editor}
+          onClose={() => {
+            setEditor(null);
+            setAdding(false);
+          }}
+          onSaved={() => {
+            load();
+            setEditor(null);
+            setAdding(false);
+          }}
+        />
+      )}
     </div>
   );
 }

@@ -49,9 +49,11 @@ export async function POST(req: Request) {
         accentColor: b.accentColor || null,
         ingredient: b.ingredient ?? null,
         tagline: b.tagline ?? null,
+        description: b.description ?? null,
         occasion: b.occasion ?? null,
         contents: b.contents ?? null,
         imageUrl: b.imageUrl ?? null,
+        images: b.images ?? null,
         active: b.active ?? true,
       })
       .returning()
