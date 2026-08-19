@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { db } from "@/db";
 import { serial } from "@/db/mutex";
 import { products } from "@/db/schema";
@@ -59,6 +60,10 @@ export async function POST(req: Request) {
       })
       .returning()
   );
+
+  revalidatePath("/", "layout");
+  revalidatePath("/shop");
+  revalidatePath("/shop/[id]", "page");
 
   return NextResponse.json(row, { status: 201 });
 }

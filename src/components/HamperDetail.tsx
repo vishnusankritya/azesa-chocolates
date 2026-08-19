@@ -49,6 +49,10 @@ export default function HamperDetail({
             </h1>
             <p className="mt-3 font-script text-2xl text-brand-orange">{product.tagline}</p>
 
+            {product.description && (
+              <p className="mt-3 max-w-md text-brand-dark/70">{product.description}</p>
+            )}
+
             <div className="mt-5 flex items-end gap-3">
               <span className="font-heading text-4xl font-black text-brand-dark">₹{product.price}</span>
               {product.mrp ? (

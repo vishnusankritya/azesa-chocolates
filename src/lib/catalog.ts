@@ -7,6 +7,7 @@ export interface CatalogProduct {
   accentColor?: string;
   ingredient?: string;
   tagline?: string;
+  description?: string;
   occasion?: string;
   contents?: string[];
   image?: string;
@@ -24,6 +25,7 @@ export type ProductRow = {
   accentColor: string | null;
   ingredient: string | null;
   tagline: string | null;
+  description: string | null;
   occasion: string | null;
   contents: string[] | null;
   imageUrl: string | null;
@@ -41,6 +43,7 @@ export function rowToProduct(p: ProductRow): CatalogProduct {
     ...(p.accentColor ? { accentColor: p.accentColor } : {}),
     ...(p.ingredient ? { ingredient: p.ingredient } : {}),
     ...(p.tagline ? { tagline: p.tagline } : {}),
+    ...(p.description ? { description: p.description } : {}),
     ...(p.occasion ? { occasion: p.occasion } : {}),
     ...(p.contents ? { contents: p.contents } : {}),
     ...(p.imageUrl ? { image: p.imageUrl } : {}),

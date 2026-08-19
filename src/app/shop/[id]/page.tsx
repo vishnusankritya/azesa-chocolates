@@ -98,6 +98,10 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
                   artificial colours.
                 </p>
 
+                {product.description && (
+                  <p className="mt-4 max-w-md text-brand-dark/70">{product.description}</p>
+                )}
+
                 <div className="mt-8 flex flex-wrap items-center gap-4">
                   <AddToCartButton id={product.id} label="Add to Cart" availability={product.availability} />
                   <div className="flex flex-wrap gap-x-5 gap-y-2">

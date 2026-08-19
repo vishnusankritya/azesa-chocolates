@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { serial } from "@/db/mutex";
@@ -36,7 +37,17 @@ export async function PATCH(
   );
 
   if (!row) return NextResponse.json({ error: "not_found" }, { status: 404 });
+
+  // On-demand revalidation so storefront pages reflect edits immediately.
+  revalidatePaths();
+
   return NextResponse.json(row);
+}
+
+function revalidatePaths() {
+  revalidatePath("/", "layout");
+  revalidatePath("/shop");
+  revalidatePath("/shop/[id]", "page");
 }
 
 export async function DELETE(
@@ -48,5 +59,6 @@ export async function DELETE(
   }
   const { slug } = await params;
   await serial(() => db.delete(products).where(eq(products.slug, slug)));
+  revalidatePaths();
   return NextResponse.json({ ok: true });
 }
