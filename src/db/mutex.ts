@@ -1,28 +1,15 @@
-// Process-wide serialization for PGlite.
+// Compatibility passthrough.
 //
-// PGlite is single-connection WASM: two queries running at once (an SSR page
-// render + a client /api fetch in the same tick) abort it permanently with
-// `RuntimeError: Aborted()`. All DB access therefore goes through this mutex so
-// queries are applied one-at-a-time, no matter which route/request fires them.
-// The queue is hoisted on globalThis so every Turbopack route graph shares it
-// (otherwise each route builds its own queue and concurrent queries bypass it).
-
-type G = typeof globalThis & { __azesaSerialQueue?: Promise<unknown> };
-
-function getQueue(): Promise<unknown> {
-  const g = globalThis as G;
-  if (!g.__azesaSerialQueue) g.__azesaSerialQueue = Promise.resolve();
-  return g.__azesaSerialQueue;
-}
+// Historically this serialized every DB query through a single process-wide
+// queue because PGlite (WASM Postgres) is single-connection — two concurrent
+// queries would abort it with `RuntimeError: Aborted()`.
+//
+// The data layer is now Postgres via the `pg` connection pool, which handles
+// concurrency natively. `serial()` therefore just runs the callback directly;
+// it is kept as a named export so existing call sites (catalog, admin orders,
+// checkout) compile unchanged and stay drop-in compatible if a query ever
+// needs to be isolated.
 
 export function serial<T>(fn: () => Promise<T> | T): Promise<T> {
-  const g = globalThis as G;
-  const q = getQueue();
-  const run = q.then(fn, fn);
-  // Keep the chain alive even if a query rejects.
-  g.__azesaSerialQueue = run.then(
-    () => undefined,
-    () => undefined
-  );
-  return run;
+  return Promise.resolve().then(fn);
 }

@@ -1,4 +1,4 @@
-/* Local DB init + seed for PGlite. Run: USE_PGLITE=1 node scripts/seed.ts */
+/* DB init + seed for Postgres. Run: DATABASE_URL=... node scripts/seed.ts */
 import { sql } from "drizzle-orm";
 import { db } from "../src/db";
 import { products as productsTable } from "../src/db/schema";

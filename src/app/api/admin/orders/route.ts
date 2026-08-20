@@ -13,7 +13,8 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 
-  // PGlite is single-connection WASM — serialize the whole fetch as one unit.
+  // Postgres pool handles concurrency; wrap the multi-step update in one unit
+  // so partial writes can't leak.
   const [orderRows, items, custs, addrs] = await serial(async () => {
     const o = await db.select().from(orders).orderBy(asc(orders.createdAt));
     const i = await db.select().from(orderItems);

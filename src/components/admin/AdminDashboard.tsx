@@ -92,7 +92,7 @@ export default function AdminDashboard() {
 
   const load = async () => {
     try {
-      // PGlite is single-connection — fetch sequentially to avoid DB races.
+      // Postgres pool handles concurrent reads; fetch sequentially for clarity.
       const oRes = await fetch("/api/admin/orders");
       const pRes = await fetch("/api/admin/products");
       if (!oRes.ok || !pRes.ok) {
