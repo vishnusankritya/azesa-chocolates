@@ -8,6 +8,8 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       { protocol: "https", hostname: "lh3.googleusercontent.com" },
       { protocol: "https", hostname: "images.unsplash.com" },
+      // Uploaded product images live on Vercel Blob.
+      { protocol: "https", hostname: "*.public.blob.vercel-storage.com" },
     ],
     formats: ["image/avif", "image/webp"],
   },

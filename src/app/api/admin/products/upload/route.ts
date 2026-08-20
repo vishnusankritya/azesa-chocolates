@@ -1,6 +1,7 @@
 import { mkdir, writeFile } from "fs/promises";
 import path from "path";
 import { NextResponse } from "next/server";
+import { put } from "@vercel/blob";
 import { requireAdmin } from "@/lib/auth";
 import { isSameOrigin, rateLimit, clientIp } from "@/lib/security";
 
@@ -11,9 +12,14 @@ const MAX_BYTES = 5 * 1024 * 1024; // 5MB per image
 const ALLOWED = new Set(["image/png", "image/jpeg", "image/webp", "image/avif", "image/gif"]);
 
 /**
- * Upload a product image to public/products/uploads (local dev).
- * NOTE: Vercel serverless /public is read-only at runtime — for a deployed app
- * this must move to blob storage (e.g. Vercel Blob / S3). Fine for local dev.
+ * Upload a product image.
+ *
+ * - Production: stored on Vercel Blob (BLOB_READ_WRITE_TOKEN) — durable,
+ *   CDN-served, survives redeploys, public URL.
+ * - Local dev (no token / no Bun env): falls back to writing into
+ *   public/products/uploads so the feature works without extra setup.
+ *
+ * Returns the public URL of the stored image.
  */
 export async function POST(req: Request) {
   if (!requireAdmin(req) || !isSameOrigin(req)) {
@@ -54,10 +60,21 @@ export async function POST(req: Request) {
     "image/gif": "gif",
   };
   const filename = `${Date.now()}-${safeBase || "image"}.${extMap[file.type] || "png"}`;
+  const buf = Buffer.from(await file.arrayBuffer());
+
+  // Production path: Vercel Blob (requires BLOB_READ_WRITE_TOKEN in env).
+  if (process.env.BLOB_READ_WRITE_TOKEN) {
+    const { url } = await put(`product-images/${filename}`, buf, {
+      access: "public",
+      contentType: file.type,
+      addRandomSuffix: true,
+    });
+    return NextResponse.json({ url }, { status: 201 });
+  }
+
+  // Local dev fallback (no token): write into the public dir.
   const dir = path.join(process.cwd(), "public", "products", "uploads");
   await mkdir(dir, { recursive: true });
-  const buf = Buffer.from(await file.arrayBuffer());
   await writeFile(path.join(dir, filename), buf);
-
   return NextResponse.json({ url: `/products/uploads/${filename}` }, { status: 201 });
 }

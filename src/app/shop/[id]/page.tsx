@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
-import Image from "next/image";
 import { getProducts, getProductBySlug } from "@/server/catalog";
+import ProductGallery from "@/components/ProductGallery";
 import AnnouncementBar from "@/components/AnnouncementBar";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
@@ -71,18 +71,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
             </Button>
 
             <div className="mt-8 grid gap-10 md:grid-cols-2 md:gap-14">
-              <div className="flex aspect-square items-center justify-center overflow-hidden rounded-2xl border-2 border-brand-dark bg-white">
-                {product.image && (
-                                  <Image
-                                    src={product.image}
-                                    alt={product.name}
-                                    width={800}
-                                    height={800}
-                                    priority
-                                    className="h-full w-full object-contain p-4 md:p-8"
-                                  />
-                                )}
-              </div>
+              <ProductGallery src={product.image} images={product.images} alt={product.name} />
 
               <div className="flex flex-col justify-center">
                 <p className="mb-3 font-heading text-sm font-black uppercase tracking-[0.15em] text-[#f47920]">
