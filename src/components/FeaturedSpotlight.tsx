@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import Button from "@/components/ui/Button";
 
 /* Piñata spotlight — title + tagline, three filling/product images in the
@@ -11,9 +12,9 @@ const SPOTLIGHT = {
   word2: "Kunafa",
   tagline: "Biscoff Piñata · Kataifa Kunafa · Cookie Piñata",
   images: [
-    { id: "biscoff", src: "/products/biscoff.png", label: "Biscoff Piñata", rot: "-7deg" },
-    { id: "kunafa-pinata", src: "/products/kunafa-pinata.png", label: "Kataifa Kunafa", rot: "6deg" },
-    { id: "cookie-pinata", src: "/products/cookie-pinata.png", label: "Cookie Piñata", rot: "-2deg" },
+    { id: "biscoff", src: "/products/biscoff.webp", label: "Biscoff Piñata", rot: "-7deg" },
+    { id: "kunafa-pinata", src: "/products/kunafa-pinata.webp", label: "Kataifa Kunafa", rot: "6deg" },
+    { id: "cookie-pinata", src: "/products/cookie-pinata.webp", label: "Cookie Piñata", rot: "-2deg" },
   ],
 };
 
@@ -63,10 +64,10 @@ export default function FeaturedSpotlight() {
             {SPOTLIGHT.tagline}
           </span>
 
-          <div className={jitterClass("mt-6")} style={{ width: 220, height: 240 }}>
-            <Link href={`/shop/${centre.id}`} className="block h-full w-full">
-              <img src={centre.src} alt={centre.label} loading="lazy" decoding="async" className={IMG_HOVER} />
-            </Link>
+          <div className={jitterClass("relative mt-6")} style={{ width: 220, height: 240 }}>
+                      <Link href={`/shop/${centre.id}`} className="block h-full w-full">
+                        <Image src={centre.src} alt={centre.label} fill sizes="220px" className={IMG_HOVER} />
+                      </Link>
           </div>
 
           <div className="mt-4">
@@ -88,7 +89,7 @@ export default function FeaturedSpotlight() {
               className={jitterClass(`flex h-full w-full items-center justify-center ${CARD_HOVER}`)}
               style={{ ["--base-rot" as string]: left.rot }}
             >
-              <img src={left.src} alt={left.label} loading="lazy" decoding="async" className={IMG_HOVER} />
+              <Image src={left.src} alt={left.label} fill sizes="220px" className={IMG_HOVER} />
             </div>
           </Link>
 
@@ -108,7 +109,7 @@ export default function FeaturedSpotlight() {
               className={jitterClass(`flex h-full w-full items-center justify-center ${CARD_HOVER}`)}
               style={{ ["--base-rot" as string]: right.rot }}
             >
-              <img src={right.src} alt={right.label} loading="lazy" decoding="async" className={IMG_HOVER} />
+              <Image src={right.src} alt={right.label} fill sizes="220px" className={IMG_HOVER} />
             </div>
           </Link>
 
@@ -159,7 +160,7 @@ export default function FeaturedSpotlight() {
               className={jitterClass(`flex h-full w-full items-center justify-center ${CARD_HOVER}`)}
               style={{ ["--base-rot" as string]: centre.rot }}
             >
-              <img src={centre.src} alt={centre.label} loading="lazy" decoding="async" className={IMG_HOVER} />
+              <Image src={centre.src} alt={centre.label} fill sizes="220px" className={IMG_HOVER} />
             </div>
           </Link>
 

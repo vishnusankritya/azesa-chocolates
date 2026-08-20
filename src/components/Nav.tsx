@@ -24,7 +24,7 @@ export default function Nav() {
             <span className="font-script text-3xl text-brand-dark">Azesa</span>
             <span className="w-1.5 h-1.5 rounded-full bg-brand-orange" />
           </span>
-          <span className="text-[10px] font-semibold text-brand-dark/40 uppercase tracking-[0.25em] pl-0.5">
+          <span className="text-[10px] font-semibold text-brand-dark/65 uppercase tracking-[0.25em] pl-0.5">
             Chocolates
           </span>
         </Link>

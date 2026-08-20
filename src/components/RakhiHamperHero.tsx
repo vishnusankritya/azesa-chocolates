@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import Button from "./ui/Button";
 import { useCart } from "@/context/CartContext";
@@ -14,7 +15,8 @@ const HAMper_POSTER =
 const HAMper_SHOWCASE = "/hamper-showcase.jpg";
 const SIBLINGS =
   "https://lh3.googleusercontent.com/aida-public/AB6AXuBrJusmMJsa7xaU0Bjp2g8nYF7YA3_SCJq6-LTTR7Clo-L7fINFOBirL5yn71BlolAZ-VHGPJ1nYQUTPNJFJe343GjS_9yH7FLdAbyscZLFfaMFEE7VJV3q9LfElOB8CBgjtWoSyRcVCxhT-29bi8PV3i5SxvJF6IQml1VQP2rbdEypNoA5VuuFgxA3fl8hBOJA9jYPPk2AgsK6SrdlFc2Ymbe-YereHLLxeCeO1jaBsjCw75GxhjPGoXyEQWHECKHryj8";
-const CHARACTERS = "/rakhi-characters.png";
+const CHARACTERS = "/rakhi-characters.webp";
+const HAMPER_IMG = (url: string) => url.replace(/\.png$/i, ".webp");
 
 export default function RakhiHamperHero() {
   const [isOpen, setIsOpen] = useState(false);
@@ -68,12 +70,15 @@ export default function RakhiHamperHero() {
         {/* Action Kamen + Nene — big, centered, floating, touching the Popular Chocolates section border */}
         <div className="absolute bottom-[-8px] left-1/2 z-20 -translate-x-1/2 md:bottom-[-12px]">
           <Link href={HAMPER_PAGE} aria-label="View Rakhi Chaos Hamper — Action Kamen and Nene">
-            <img
-              src={CHARACTERS}
-              alt="Azesa Rakhi — Action Kamen and Nene"
-              className="animate-float h-36 w-36 cursor-pointer object-contain drop-shadow-lg md:h-44 md:w-44"
-            />
-          </Link>
+                      <Image
+                        src={CHARACTERS}
+                        alt="Azesa Rakhi — Action Kamen and Nene"
+                        width={176}
+                        height={176}
+                        loading="eager"
+                        className="animate-float h-36 w-36 cursor-pointer object-contain drop-shadow-lg md:h-44 md:w-44"
+                      />
+                    </Link>
         </div>
 
         <div className="relative z-10 mx-auto grid max-w-7xl items-start gap-8 px-6 pb-20 pt-10 md:grid-cols-[45%_55%] md:px-10 md:pt-14 lg:px-16">
@@ -117,38 +122,47 @@ export default function RakhiHamperHero() {
           <div className="animate-float relative mx-auto mt-8 h-[430px] w-full max-w-[620px] md:-mt-28 md:h-[560px]">
             <div className="absolute left-[6%] top-[12%] h-[80%] w-[80%] rounded-full bg-[#ffcb09]/35 blur-3xl" aria-hidden />
             <Link
-              href={HAMPER_PAGE}
-              aria-label="View Rakhi Chaos Hamper — sibling characters"
-              className="absolute right-0 top-0 z-10 block"
-            >
-              <img
-                src={SIBLINGS}
-                alt="Azesa Happy Rakhi — sibling characters"
-                className="h-40 w-40 rotate-6 cursor-pointer rounded-full border-4 border-white object-cover shadow-xl transition-transform duration-300 hover:rotate-0 hover:scale-[1.05] md:h-56 md:w-56"
-              />
-            </Link>
-            <Link
-              href={HAMPER_PAGE}
-              aria-label="View Rakhi Chaos Hamper — hamper box"
-              className="absolute left-[4%] top-[16%] z-20 block w-[56%] -rotate-6"
-            >
-              <img
-                src={HAMper_POSTER}
-                alt="Azesa Rakhi hamper box"
-                className="h-auto w-full cursor-pointer rounded-2xl border-4 border-white object-cover shadow-2xl transition-transform duration-300 hover:scale-[1.08] hover:rotate-2"
-              />
-            </Link>
-            <Link
-              href={HAMPER_PAGE}
-              aria-label="View Rakhi Chaos Hamper — hamper contents"
-              className="absolute bottom-0 right-[2%] z-30 block w-[48%] rotate-12"
-            >
-              <img
-                src={HAMper_SHOWCASE}
-                alt="Rakhi hamper contents and keychains"
-                className="h-auto w-full cursor-pointer rounded-xl border-2 border-white object-cover shadow-xl transition-transform duration-300 hover:-rotate-6 hover:scale-[1.05]"
-              />
-            </Link>
+                          href={HAMPER_PAGE}
+                          aria-label="View Rakhi Chaos Hamper — sibling characters"
+                          className="absolute right-0 top-0 z-10 block"
+                        >
+                          <Image
+                            src={SIBLINGS}
+                            alt="Azesa Happy Rakhi — sibling characters"
+                            width={224}
+                            height={224}
+                            loading="lazy"
+                            className="h-40 w-40 rotate-6 cursor-pointer rounded-full border-4 border-white object-cover shadow-xl transition-transform duration-300 hover:rotate-0 hover:scale-[1.05] md:h-56 md:w-56"
+                          />
+                        </Link>
+                        <Link
+                          href={HAMPER_PAGE}
+                          aria-label="View Rakhi Chaos Hamper — hamper box"
+                          className="absolute left-[4%] top-[16%] z-20 block w-[56%] -rotate-6"
+                        >
+                          <Image
+                            src={HAMPER_IMG(HAMper_POSTER)}
+                            alt="Azesa Rakhi hamper box"
+                            width={600}
+                            height={400}
+                            loading="lazy"
+                            className="h-auto w-full cursor-pointer rounded-2xl border-4 border-white object-cover shadow-2xl transition-transform duration-300 hover:scale-[1.08] hover:rotate-2"
+                          />
+                        </Link>
+                        <Link
+                          href={HAMPER_PAGE}
+                          aria-label="View Rakhi Chaos Hamper — hamper contents"
+                          className="absolute bottom-0 right-[2%] z-30 block w-[48%] rotate-12"
+                        >
+                          <Image
+                            src={HAMper_SHOWCASE}
+                            alt="Rakhi hamper contents and keychains"
+                            width={480}
+                            height={360}
+                            loading="lazy"
+                            className="h-auto w-full cursor-pointer rounded-xl border-2 border-white object-cover shadow-xl transition-transform duration-300 hover:-rotate-6 hover:scale-[1.05]"
+                          />
+                        </Link>
             <div className="pointer-events-none absolute bottom-[5%] right-[44%] z-40 text-3xl text-[#ffcb09] drop-shadow" aria-hidden>
               ★
             </div>
@@ -179,14 +193,16 @@ export default function RakhiHamperHero() {
               </button>
             </div>
             {HAMPER?.image && (
-              <div className="my-5 flex items-center justify-center overflow-hidden rounded-2xl border-2 border-[#1c1109]/15 bg-white">
-                <img
-                  src={HAMPER.image}
-                  alt={HAMPER.name}
-                  className="h-40 w-full cursor-pointer object-contain p-2 transition-transform duration-300 hover:scale-110"
-                />
-              </div>
-            )}
+                          <div className="my-5 flex items-center justify-center overflow-hidden rounded-2xl border-2 border-[#1c1109]/15 bg-white">
+                            <Image
+                              src={HAMPER_IMG(HAMPER.image)}
+                              alt={HAMPER.name}
+                              width={400}
+                              height={400}
+                              className="h-40 w-full cursor-pointer object-contain p-2 transition-transform duration-300 hover:scale-110"
+                            />
+                          </div>
+                        )}
             <div className="flex items-start justify-between gap-4">
               <h2 id="rakhi-order-title" className="font-heading text-3xl text-[#1c1c17]">
                 {HAMPER?.name ?? "Reserve the chaos"}

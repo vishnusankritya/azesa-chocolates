@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import type { CatalogProduct } from "@/lib/catalog";
 import Button from "@/components/ui/Button";
 import AddToCartButton from "@/components/AddToCartButton";
@@ -39,14 +40,16 @@ export default function BestsellerCarousel({ products }: { products: CatalogProd
                                   }}
                                 >
                                   {product.image ? (
-                                    <img
-                                      src={product.image}
-                                      alt={product.name}
-                                      loading="lazy"
-                                      decoding="async"
-                                      className="w-full h-full object-contain p-2 transition-transform duration-200 group-hover:scale-110 md:p-3"
-                                    />
-                                  ) : (
+                                                                      <Image
+                                                                        src={product.image}
+                                                                        alt={product.name}
+                                                                        fill
+                                                                        sizes="200px"
+                                                                        loading="lazy"
+                                                                        decoding="async"
+                                                                        className="object-contain p-2 transition-transform duration-200 group-hover:scale-110 md:p-3"
+                                                                      />
+                                                                    ) : (
                   <div
                     className="w-full h-full flex flex-col items-center justify-center"
                     style={{ backgroundColor: product.accentColor + "20" }}
@@ -65,7 +68,7 @@ export default function BestsellerCarousel({ products }: { products: CatalogProd
                 <p className="font-heading text-brand-dark uppercase tracking-wide leading-tight" style={{ fontSize: 14 }}>
                   {product.name}
                 </p>
-                <p className="text-brand-dark/40 text-sm mt-0.5">₹{product.price}</p>
+                <p className="text-brand-dark/65 text-sm mt-0.5">₹{product.price}</p>
               </Link>
 
               <AddToCartButton

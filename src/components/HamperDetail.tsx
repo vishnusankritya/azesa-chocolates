@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { CatalogProduct } from "@/lib/catalog";
+import Image from "next/image";
 import AddToCartButton from "@/components/AddToCartButton";
 import ProductCard from "@/components/ProductCard";
 
@@ -22,7 +23,7 @@ export default function HamperDetail({
           >
             ← Back to shop
           </Link>
-          <span className="hidden font-heading text-sm font-black uppercase tracking-[0.1em] text-brand-dark/40 md:inline-block">
+          <span className="hidden font-heading text-sm font-black uppercase tracking-[0.1em] text-brand-dark/65 md:inline-block">
             Gift Hampers
           </span>
         </div>
@@ -31,12 +32,15 @@ export default function HamperDetail({
           {/* Image */}
           <div className="flex aspect-square items-center justify-center overflow-hidden rounded-2xl border-2 border-brand-dark bg-white shadow-[6px_6px_0_0_#1c1109]">
             {product.image && (
-              <img
-                src={product.image}
-                alt={product.name}
-                className="h-full w-full object-contain p-4 md:p-8"
-              />
-            )}
+                          <Image
+                            src={product.image}
+                            alt={product.name}
+                            width={800}
+                            height={800}
+                            priority
+                            className="h-full w-full object-contain p-4 md:p-8"
+                          />
+                        )}
           </div>
 
           {/* Details */}
@@ -56,7 +60,7 @@ export default function HamperDetail({
             <div className="mt-5 flex items-end gap-3">
               <span className="font-heading text-4xl font-black text-brand-dark">₹{product.price}</span>
               {product.mrp ? (
-                <span className="mb-1 font-heading text-xl text-brand-dark/40 line-through">
+                <span className="mb-1 font-heading text-xl text-brand-dark/65 line-through">
                   ₹{product.mrp}
                 </span>
               ) : null}

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import type { CatalogProduct } from "@/lib/catalog";
 import AddToCartButton from "@/components/AddToCartButton";
 
@@ -10,14 +11,16 @@ export default function ProductCard({ product }: { product: CatalogProduct }) {
       <Link href={`/shop/${product.id}`} className="flex flex-col">
         <div className="relative flex aspect-square items-center justify-center overflow-hidden rounded-xl bg-white">
           {product.image ? (
-            <img
-              src={product.image}
-              alt={product.name}
-              loading="lazy"
-              decoding="async"
-              className="h-full w-full object-contain p-1.5 transition-transform duration-300 group-hover:scale-105"
-            />
-          ) : (
+                      <Image
+                        src={product.image}
+                        alt={product.name}
+                        fill
+                        sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
+                        loading="lazy"
+                        decoding="async"
+                        className="h-full w-full object-contain p-1.5 transition-transform duration-300 group-hover:scale-105"
+                      />
+                    ) : (
             <div
               className="flex h-full w-full flex-col items-center justify-center"
               style={{ backgroundColor: product.accentColor + "20" }}
@@ -40,7 +43,7 @@ export default function ProductCard({ product }: { product: CatalogProduct }) {
           <p className="font-heading text-center text-sm font-black leading-tight text-brand-dark md:text-base">
             {product.name}
           </p>
-          <p className="mt-0.5 text-center text-sm font-semibold text-brand-dark/45">₹{product.price}</p>
+          <p className="mt-0.5 text-center text-sm font-semibold text-brand-dark/65">₹{product.price}</p>
         </div>
       </Link>
       <div className="mt-auto flex justify-center pt-1">

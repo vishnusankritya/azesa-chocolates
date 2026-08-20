@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Button from "@/components/ui/Button";
 
 export default function Hero() {
@@ -54,14 +55,18 @@ export default function Hero() {
           >
             {/* Hamper enlarged so it spills out past the card edges — jitter + hover enlarge (item only) */}
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="tilt jitter" style={{ ["--base-rot" as string]: "1.5deg" }}>
-                <img
-                  src="/rakhi-hamper.png"
-                  alt="Azesa Happy Rakhi Hamper"
-                  className="h-[460px] w-[460px] cursor-pointer object-contain transition-transform duration-300 hover:scale-110"
-                />
-              </div>
-            </div>
+                            <div className="tilt jitter" style={{ ["--base-rot" as string]: "1.5deg" }}>
+                              <Image
+                                src="/rakhi-hamper.webp"
+                                alt="Azesa Happy Rakhi Hamper"
+                                width={460}
+                                height={460}
+                                priority
+                                fetchPriority="high"
+                                className="h-[460px] w-[460px] cursor-pointer object-contain transition-transform duration-300 hover:scale-110"
+                              />
+                            </div>
+                          </div>
 
             <div
               className="absolute -bottom-6 -right-6 w-[76px] h-[76px] rounded-full flex flex-col items-center justify-center text-center z-10"

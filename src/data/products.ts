@@ -21,7 +21,7 @@ export const products: Product[] = [
     accentColor: "#facc15",
     ingredient: "Alphonso Mango",
     tagline: "Sweet, tropical indulgence.",
-    image: "/products/mango.png",
+    image: "/products/mango.webp",
   },
   {
     id: "cookie-cream",
@@ -31,7 +31,7 @@ export const products: Product[] = [
     accentColor: "#3b82f6",
     ingredient: "Sandwich Cookies",
     tagline: "Two classics, one bar.",
-    image: "/products/cookie-cream.png",
+    image: "/products/cookie-cream.webp",
   },
   {
     id: "cranberry",
@@ -41,7 +41,7 @@ export const products: Product[] = [
     accentColor: "#db2777",
     ingredient: "Dried Cranberries",
     tagline: "All I need is you.",
-    image: "/products/cranberry.png",
+    image: "/products/cranberry.webp",
   },
   {
     id: "kunafa-pinata",
@@ -51,7 +51,7 @@ export const products: Product[] = [
     accentColor: "#16a34a",
     ingredient: "Kataifi & Pistachio",
     tagline: "Middle-eastern indulgence.",
-    image: "/products/kunafa-pinata.png",
+    image: "/products/kunafa-pinata.webp",
   },
   {
     id: "biscoff",
@@ -61,7 +61,7 @@ export const products: Product[] = [
     accentColor: "#be123c",
     ingredient: "Biscoff Spread",
     tagline: "Caramelised to perfection.",
-    image: "/products/biscoff.png",
+    image: "/products/biscoff.webp",
   },
   {
     id: "choc-chip",
@@ -71,7 +71,7 @@ export const products: Product[] = [
     accentColor: "#b45309",
     ingredient: "Dark Chocolate Chips",
     tagline: "Comfort in every bite.",
-    image: "/products/choc-chip.png",
+    image: "/products/choc-chip.webp",
   },
   {
     id: "strawberry-sunrise",
@@ -81,7 +81,7 @@ export const products: Product[] = [
     accentColor: "#fb7185",
     ingredient: "Strawberries & White Chocolate",
     tagline: "Sunrise in a bite.",
-    image: "/products/strawberry-sunrise.png",
+    image: "/products/strawberry-sunrise.webp",
   },
   {
     id: "harry-potter-coffee",
@@ -91,7 +91,7 @@ export const products: Product[] = [
     accentColor: "#78350f",
     ingredient: "Magical Coffee Dark Chocolate",
     tagline: "A spell in every square.",
-    image: "/products/harry-potter-coffee.png",
+    image: "/products/harry-potter-coffee.webp",
   },
   {
     id: "adventurous-almond",
@@ -101,7 +101,7 @@ export const products: Product[] = [
     accentColor: "#d97706",
     ingredient: "Roasted Almonds",
     tagline: "Crunchy. Bold. Adventurous.",
-    image: "/products/adventurous-almond.png",
+    image: "/products/adventurous-almond.webp",
   },
   {
     id: "valentines-coffee",
@@ -111,7 +111,7 @@ export const products: Product[] = [
     accentColor: "#e11d48",
     ingredient: "Coffee & Caramel",
     tagline: "Made for two.",
-    image: "/products/valentines-coffee.png",
+    image: "/products/valentines-coffee.webp",
   },
   {
     id: "cookie-pinata",
@@ -121,7 +121,7 @@ export const products: Product[] = [
     accentColor: "#f97316",
     ingredient: "Kunafa & Pistachio Cookie",
     tagline: "Smash it open.",
-    image: "/products/cookie-pinata.png",
+    image: "/products/cookie-pinata.webp",
   },
   {
     id: "coffee-berry-gud",
@@ -131,7 +131,7 @@ export const products: Product[] = [
     accentColor: "#92400e",
     ingredient: "Coffee, Berries & Gud",
     tagline: "Desi sweetness, roasted.",
-    image: "/products/coffee-berry-gud.png",
+    image: "/products/coffee-berry-gud.webp",
   },
   {
     id: "choco-chips",
@@ -141,7 +141,7 @@ export const products: Product[] = [
     accentColor: "#4b5563",
     ingredient: "Double Chocolate Chips",
     tagline: "Twice the cocoa, twice the love.",
-    image: "/products/choco-chips.png",
+    image: "/products/choco-chips.webp",
   },
   {
       id: "holi-edition-white",
@@ -151,7 +151,7 @@ export const products: Product[] = [
       accentColor: "#8b5cf6",
       ingredient: "White Chocolate & Sprinkles",
       tagline: "Colours of Holi, in chocolate form.",
-      image: "/products/holi-edition-white.png",
+      image: "/products/holi-edition-white.webp",
     },
     {
       id: "thandai",
@@ -174,7 +174,7 @@ export const products: Product[] = [
       accentColor: "#9a4600",
       ingredient: "Biscoff & Cookie Piñata, Mango bar, rakhis & surprises",
       tagline: "Sibling chaos, boxed with love.",
-      image: "/rakhi-hamper.png",
+      image: "/rakhi-hamper.webp",
       occasion:
         "Raksha Bandhan — the festival of sibling love. A joy-filled hamper for that beautiful, wonderfully crazy bond between brothers and sisters.",
       contents: [
@@ -198,7 +198,7 @@ export const products: Product[] = [
       accentColor: "#e11d48",
       ingredient: "Teddy, Chocolates & Love",
       tagline: "For the one you're sweet on.",
-      image: "/products/romantic-teddy-hamper.png",
+      image: "/products/romantic-teddy-hamper.webp",
       occasion:
         "Valentine's Day, anniversaries & every sweet milestone — for the one you're head over heels for.",
       contents: [

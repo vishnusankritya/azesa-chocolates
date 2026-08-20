@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useCart } from "@/context/CartContext";
 import { useProducts } from "@/lib/useProducts";
 import QtyStepper from "@/components/QtyStepper";
@@ -139,14 +140,16 @@ export default function CartClient() {
                     className="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-xl border-2 border-brand-dark bg-white"
                   >
                     {product.image && (
-                      <img
-                        src={product.image}
-                        alt={product.name}
-                        loading="lazy"
-                        decoding="async"
-                        className="h-full w-full object-contain p-2"
-                      />
-                    )}
+                                          <Image
+                                            src={product.image}
+                                            alt={product.name}
+                                            width={96}
+                                            height={96}
+                                            loading="lazy"
+                                            decoding="async"
+                                            className="h-full w-full object-contain p-2"
+                                          />
+                                        )}
                   </Link>
 
                   <div className="min-w-0 flex-1">
@@ -156,7 +159,7 @@ export default function CartClient() {
                     >
                       {product.name}
                     </Link>
-                    <p className="mt-1 text-sm font-semibold text-brand-dark/45">
+                    <p className="mt-1 text-sm font-semibold text-brand-dark/65">
                       ₹{product.price} each
                     </p>
                   </div>
@@ -366,7 +369,7 @@ export default function CartClient() {
                   >
                     {placing ? "Placing order…" : `Place order · ₹${subtotal}`}
                   </button>
-                  <p className="text-center text-[11px] font-semibold text-brand-dark/45">
+                  <p className="text-center text-[11px] font-semibold text-brand-dark/65">
                     Pay by scanning the UPI QR after placing your order. Your order stays pending until we confirm the payment.
                   </p>
                 </form>

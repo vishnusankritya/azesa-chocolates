@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import Image from "next/image";
 import { getProducts, getProductBySlug } from "@/server/catalog";
 import AnnouncementBar from "@/components/AnnouncementBar";
 import Nav from "@/components/Nav";
@@ -72,12 +73,15 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
             <div className="mt-8 grid gap-10 md:grid-cols-2 md:gap-14">
               <div className="flex aspect-square items-center justify-center overflow-hidden rounded-2xl border-2 border-brand-dark bg-white">
                 {product.image && (
-                  <img
-                    src={product.image}
-                    alt={product.name}
-                    className="h-full w-full object-contain p-4 md:p-8"
-                  />
-                )}
+                                  <Image
+                                    src={product.image}
+                                    alt={product.name}
+                                    width={800}
+                                    height={800}
+                                    priority
+                                    className="h-full w-full object-contain p-4 md:p-8"
+                                  />
+                                )}
               </div>
 
               <div className="flex flex-col justify-center">

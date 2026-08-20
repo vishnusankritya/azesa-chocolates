@@ -34,6 +34,10 @@ export type ProductRow = {
 };
 
 export function rowToProduct(p: ProductRow): CatalogProduct {
+  // Image optimization: all product art converted PNG→WebP (≈90% smaller).
+  // Remap any legacy .png path stored in the DB to the new .webp asset so
+  // existing deployments don't 404.
+  const imageUrl = p.imageUrl?.replace(/\.png$/i, ".webp") ?? null;
   return {
     id: p.slug,
     name: p.name,
@@ -46,7 +50,7 @@ export function rowToProduct(p: ProductRow): CatalogProduct {
     ...(p.description ? { description: p.description } : {}),
     ...(p.occasion ? { occasion: p.occasion } : {}),
     ...(p.contents ? { contents: p.contents } : {}),
-    ...(p.imageUrl ? { image: p.imageUrl } : {}),
+    ...(imageUrl ? { image: imageUrl } : {}),
     availability: (p.availability as CatalogProduct["availability"]) ?? "available",
     stock: p.stock ?? 0,
   };

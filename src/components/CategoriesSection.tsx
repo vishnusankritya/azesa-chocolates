@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import type { CSSProperties } from "react";
 import Button from "@/components/ui/Button";
@@ -16,7 +17,7 @@ const categories: {
   {
     id: "chocolates",
     label: "Chocolates",
-    img: "/categories/chocolates.png",
+    img: "/categories/chocolates.webp",
     shape: "squircle",
     bg: "#7c3aed",
     pattern:
@@ -25,7 +26,7 @@ const categories: {
   {
     id: "cookies",
     label: "Cookies",
-    img: "/categories/cookies.png",
+    img: "/categories/cookies.webp",
     shape: "star",
     bg: "#ec4899",
     pattern: "none",
@@ -33,7 +34,7 @@ const categories: {
   {
     id: "pinata",
     label: "Piñata",
-    img: "/categories/pinata.png",
+    img: "/categories/pinata.webp",
     shape: "circle",
     bg: "#f97316",
     pattern:
@@ -42,7 +43,7 @@ const categories: {
   {
       id: "hampers",
       label: "Hampers",
-      img: "/categories/hampers.png",
+      img: "/categories/hampers.webp",
       shape: "grid",
       bg: "#fde047",
     pattern:
@@ -52,7 +53,7 @@ const categories: {
   {
     id: "festivals",
     label: "Festivals",
-    img: "/categories/festivals.png",
+    img: "/categories/festivals.webp",
     shape: "diamond",
     bg: "#10b981",
     pattern:
@@ -78,14 +79,8 @@ function StarShape({ bg, img, alt }: { bg: string; img: string; alt: string }) {
         <polygon points={pts.join(" ")} fill={bg} stroke="#1c1109" strokeWidth="4" strokeLinejoin="round" />
       </svg>
       <div className="absolute inset-0 flex items-center justify-center p-4 md:p-6">
-            <img
-              src={img}
-              alt={alt}
-              loading="lazy"
-              decoding="async"
-              className="h-full w-full object-contain transition-transform duration-200 group-hover:scale-110 drop-shadow-[2px_2px_0_rgba(0,0,0,0.15)]"
-            />
-          </div>
+                  <Image fill src={img} alt={alt} sizes="176px" className="h-full w-full object-contain transition-transform duration-200 group-hover:scale-110 drop-shadow-[2px_2px_0_rgba(0,0,0,0.15)]" />
+                </div>
         </div>
   );
 }
@@ -114,16 +109,16 @@ function ShapeTile({ c }: { c: (typeof categories)[number] }) {
         style={style}
       >
         <div className="absolute inset-0 flex items-center justify-center p-4 md:p-6">
-                <img
-                  src={c.img}
-                  alt={c.label}
-                  loading="lazy"
-                  decoding="async"
-                  className={`h-full w-full object-contain transition-transform duration-200 group-hover:scale-110 ${
-                    c.shape === "diamond" ? "-rotate-45" : ""
-                  } drop-shadow-[3px_3px_0_rgba(0,0,0,0.2)]`}
-                />
-              </div>
+                        <Image
+                          src={c.img}
+                          alt={c.label}
+                          fill
+                          sizes="176px"
+                          className={`object-contain transition-transform duration-200 group-hover:scale-110 ${
+                            c.shape === "diamond" ? "-rotate-45" : ""
+                          } drop-shadow-[3px_3px_0_rgba(0,0,0,0.2)]`}
+                        />
+                      </div>
       </div>
     );
 }
