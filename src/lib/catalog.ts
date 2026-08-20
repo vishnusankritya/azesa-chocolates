@@ -11,6 +11,7 @@ export interface CatalogProduct {
   occasion?: string;
   contents?: string[];
   image?: string;
+  images?: string[];
   availability?: "available" | "out_of_stock" | "coming_soon" | "hidden";
   stock?: number;
 }
@@ -29,15 +30,19 @@ export type ProductRow = {
   occasion: string | null;
   contents: string[] | null;
   imageUrl: string | null;
+  images: string[] | null;
   availability: string;
   stock: number;
 };
+
+const webp = (u: string) => u.replace(/\.png$/i, ".webp");
 
 export function rowToProduct(p: ProductRow): CatalogProduct {
   // Image optimization: all product art converted PNG→WebP (≈90% smaller).
   // Remap any legacy .png path stored in the DB to the new .webp asset so
   // existing deployments don't 404.
-  const imageUrl = p.imageUrl?.replace(/\.png$/i, ".webp") ?? null;
+  const imageUrl = p.imageUrl ? webp(p.imageUrl) : null;
+  const images = p.images?.filter(Boolean).map(webp) ?? null;
   return {
     id: p.slug,
     name: p.name,
@@ -51,6 +56,7 @@ export function rowToProduct(p: ProductRow): CatalogProduct {
     ...(p.occasion ? { occasion: p.occasion } : {}),
     ...(p.contents ? { contents: p.contents } : {}),
     ...(imageUrl ? { image: imageUrl } : {}),
+    ...(images?.length ? { images } : {}),
     availability: (p.availability as CatalogProduct["availability"]) ?? "available",
     stock: p.stock ?? 0,
   };

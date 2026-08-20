@@ -75,6 +75,21 @@ export default function ProductEditor({ product, onSaved, onClose }: Props) {
     setNewUrl("");
   };
 
+  // Reorder images — index 0 is the storefront primary.
+  const move = (idx: number, dir: -1 | 1) => {
+    const j = idx + dir;
+    if (j < 0 || j >= images.length) return;
+    setImages((arr) => {
+      const next = [...arr];
+      [next[idx], next[j]] = [next[j], next[idx]];
+      return next;
+    });
+  };
+  const makePrimary = (idx: number) => {
+    if (idx === 0) return;
+    setImages((arr) => [arr[idx], ...arr.slice(0, idx), ...arr.slice(idx + 1)]);
+  };
+
   const upload = async (file: File) => {
     setBusy(true);
     setError(null);
@@ -249,8 +264,47 @@ export default function ProductEditor({ product, onSaved, onClose }: Props) {
           <label className={labelCls}>Images ({images.length}) — first is the storefront image</label>
           <div className="flex flex-wrap gap-3">
             {images.map((img, idx) => (
-              <div key={idx} className="relative h-20 w-20 overflow-hidden rounded-xl border-2 border-brand-dark bg-white">
+              <div key={img + idx} className="relative h-20 w-20 overflow-hidden rounded-xl border-2 border-brand-dark bg-white">
                 <img src={img} alt="" className="h-full w-full object-contain p-1" loading="lazy" decoding="async" />
+                {idx === 0 ? (
+                  <span
+                    title="Primary image (shown in storefront)"
+                    className="absolute left-0.5 top-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-[#f47920] text-[10px] text-white"
+                  >
+                    ★
+                  </span>
+                ) : (
+                  <button
+                    type="button"
+                    aria-label="Make this the primary image"
+                    title="Set as primary"
+                    onClick={() => makePrimary(idx)}
+                    className="absolute left-0.5 top-0.5 flex h-5 w-5 cursor-pointer items-center justify-center rounded-full border border-brand-dark/30 bg-white text-[10px] text-brand-dark/60 hover:text-[#f47920]"
+                  >
+                    ☆
+                  </button>
+                )}
+                {/* reorder: left/right */}
+                <button
+                  type="button"
+                  aria-label="Move image left"
+                  title="Move left"
+                  onClick={() => move(idx, -1)}
+                  disabled={idx === 0}
+                  className="absolute bottom-0.5 left-0.5 flex h-5 w-5 cursor-pointer items-center justify-center rounded-full bg-brand-dark/70 text-xs font-black text-white disabled:opacity-30"
+                >
+                  ←
+                </button>
+                <button
+                  type="button"
+                  aria-label="Move image right"
+                  title="Move right"
+                  onClick={() => move(idx, 1)}
+                  disabled={idx === images.length - 1}
+                  className="absolute bottom-0.5 left-7 flex h-5 w-5 cursor-pointer items-center justify-center rounded-full bg-brand-dark/70 text-xs font-black text-white disabled:opacity-30"
+                >
+                  →
+                </button>
                 <button
                   type="button"
                   aria-label="Remove image"
