@@ -214,7 +214,7 @@ export default function AdminDashboard() {
     <div className="mx-auto max-w-6xl px-6 py-16 md:px-10">
       <div className="mb-10 flex items-start justify-between gap-4">
         <div>
-          <p className="font-heading text-sm font-black uppercase tracking-[0.15em] text-[#f47920]">Azésa · Admin</p>
+          <p className="font-heading text-sm font-black uppercase tracking-[0.15em] text-[#f47920]">Azesa · Admin</p>
           <h1 className="mt-1 font-heading text-4xl font-black tracking-[-0.02em] text-brand-dark">Orders</h1>
           <p className="mt-2 text-sm text-brand-dark/55">
             {orders ? `${orders.length} order${orders.length === 1 ? "" : "s"}` : "Loading…"}

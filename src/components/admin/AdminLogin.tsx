@@ -44,7 +44,7 @@ export default function AdminLogin() {
       <div className="relative w-full max-w-md">
         <div className="mb-8 text-center">
           <p className="font-heading text-sm font-black uppercase tracking-[0.18em] text-[#f47920]">
-            Azésa · Admin
+            Azesa · Admin
           </p>
           <h2 className="mt-2 font-heading text-4xl font-black tracking-[-0.02em] text-brand-dark">
             Sign in

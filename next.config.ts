@@ -1,8 +1,17 @@
+import path from "path";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   /* config options here */
   reactCompiler: true,
+
+  // This project lives inside a home directory that has its own lockfile, so
+  // Turbopack would otherwise infer that as the workspace root. Pin it to the
+  // app directory so module resolution and file watching stay scoped here.
+  turbopack: {
+    root: path.resolve(__dirname),
+  },
+
   // Allow next/image to optimize the Google-hosted product images.
   images: {
     remotePatterns: [

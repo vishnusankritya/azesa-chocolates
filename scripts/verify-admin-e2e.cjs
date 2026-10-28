@@ -1,6 +1,8 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
+// Playwright is resolved from the parent node_modules (not a project dependency).
 const { chromium } = require("playwright");
 
-const BASE = "http://localhost:3212";
+const BASE = process.env.E2E_BASE_URL || "http://localhost:3212";
 const results = [];
 let passed = 0, failed = 0;
 
@@ -29,12 +31,12 @@ async function waitForApiValue(page, slug, field, expected, timeout = 12000) {
   const start = Date.now();
   while (Date.now() - start < timeout) {
     const ok = await page.evaluate(
-      async ({ slug, field, expected }) => {
-        const r = await fetch("http://localhost:3212/api/admin/products").then((x) => x.json());
+      async ({ base, slug, field, expected }) => {
+        const r = await fetch(`${base}/api/admin/products`).then((x) => x.json());
         const m = r.find((p) => p.slug === slug);
         return !!m && JSON.stringify(m[field]) === JSON.stringify(expected);
       },
-      { slug, field, expected }
+      { base: BASE, slug, field, expected }
     );
     if (ok) return true;
     await page.waitForTimeout(300);
@@ -65,9 +67,6 @@ async function clickEdit(page, productName) {
   await page.waitForSelector('textarea[placeholder*="What makes" ] , input[placeholder="Product name"]', { timeout: 10000 });
   return clicked;
 }
-
-const setField = (page, selector, value) =>
-  page.locator(selector).fill(String(value));
 
 async function openEditor(page, productName) {
   await clickEdit(page, productName);
@@ -201,11 +200,11 @@ async function saveAndWait(page) {
 
   // --- HAMPER: mrp + occasion + contents ---
   console.log("\n=== HAMPER (mrp, occasion, contents) ===");
-  const hamperInfo = await page.evaluate(async () => {
-    const r = await fetch("http://localhost:3212/api/admin/products").then((x) => x.json());
+  const hamperInfo = await page.evaluate(async (base) => {
+    const r = await fetch(`${base}/api/admin/products`).then((x) => x.json());
     const h = r.find((p) => p.type === "hamper");
     return h ? { name: h.name, slug: h.slug } : null;
-  });
+  }, BASE);
   console.log("  hamper product:", hamperInfo?.name);
   if (hamperInfo) {
     await openEditor(page, hamperInfo.name);

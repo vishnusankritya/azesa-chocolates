@@ -2,9 +2,8 @@
 // /rakhi-hamper.png -> /rakhi-hamper.webp, /products/x.png -> /products/x.webp
 // Originals stay (git-tracked) so a rollback is a one-line revert.
 import sharp from "sharp";
-import { readFileSync, readdirSync, statSync, writeFileSync, existsSync } from "fs";
+import { readdirSync, statSync, writeFileSync, existsSync } from "fs";
 
-const ROOT = process.cwd();
 const targets = [
   "public/rakhi-hamper.png",
   "public/rakhi-characters.png",
