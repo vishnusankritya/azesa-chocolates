@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import ProductEditor, { type AdminProduct } from "@/components/admin/ProductEditor";
 import { orderConfirmationLink } from "@/lib/whatsapp";
@@ -64,6 +64,17 @@ const AVAIL_LABEL: Record<string, string> = {
   hidden: "Hidden",
 };
 
+// Plural labels for the product-type filter.
+const CAT_LABEL: Record<string, string> = {
+  chocolate: "Chocolates",
+  cookie: "Cookies",
+  hamper: "Hampers",
+};
+
+function catLabel(t: string): string {
+  return CAT_LABEL[t] ?? t.charAt(0).toUpperCase() + t.slice(1).replace(/_/g, " ") + "s";
+}
+
 function paymentLabelOf(m: string): string {
   return m === "cod" ? "Cash on Delivery" : m === "upi_qr" ? "UPI (Scan & Pay)" : "Online";
 }
@@ -90,7 +101,7 @@ export default function AdminDashboard() {
   const [editor, setEditor] = useState<AdminProduct | null>(null);
   const [adding, setAdding] = useState(false);
 
-  const load = async () => {
+  const load = useCallback(async () => {
     try {
       // Postgres pool handles concurrent reads; fetch sequentially for clarity.
       const oRes = await fetch("/api/admin/orders");
@@ -104,11 +115,15 @@ export default function AdminDashboard() {
     } catch {
       setError("Failed to load admin data");
     }
-  };
+  }, []);
 
   useEffect(() => {
-    load();
-  }, []);
+    // Fetch on mount. The async IIFE keeps the setState calls off the effect's
+    // synchronous path (react-hooks/set-state-in-effect).
+    (async () => {
+      await load();
+    })();
+  }, [load]);
 
   const setStatus = async (id: string, status: string) => {
     setBusy(id);
@@ -140,6 +155,7 @@ export default function AdminDashboard() {
 
   const [orderTab, setOrderTab] = useState<string>("pending");
   const [paidSub, setPaidSub] = useState<string>("all");
+  const [productCat, setProductCat] = useState<string>("all");
 
   const counts = useMemo(() => {
     const c: Record<string, number> = { pending: 0, paid: 0, packed: 0, dispatched: 0, fulfilled: 0, cancelled: 0 };
@@ -156,6 +172,21 @@ export default function AdminDashboard() {
     }
     return orders.filter((o) => o.status === orderTab);
   }, [orders, orderTab, paidSub]);
+
+  // Product category filter: one pill per distinct product type, with counts.
+  const productCats = useMemo(() => {
+    if (!products) return [] as { type: string; count: number }[];
+    const counts = new Map<string, number>();
+    products.forEach((p) => counts.set(p.type, (counts.get(p.type) ?? 0) + 1));
+    return [...counts.entries()]
+      .map(([type, count]) => ({ type, count }))
+      .sort((a, b) => a.type.localeCompare(b.type));
+  }, [products]);
+
+  const visibleProducts = useMemo(() => {
+    if (!products) return [];
+    return productCat === "all" ? products : products.filter((p) => p.type === productCat);
+  }, [products, productCat]);
 
   const pill = (active: boolean) =>
     `cursor-pointer rounded-full border-2 px-4 py-2 font-heading text-sm font-black uppercase tracking-wide transition-colors ${
@@ -319,33 +350,77 @@ export default function AdminDashboard() {
             + Add product
           </button>
         </div>
-        {products ? (
-          <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {products.map((p) => (
-              <div
-                key={p.id}
-                className="flex items-center justify-between gap-2 rounded-2xl border-2 border-brand-dark/20 bg-[#fbf7ee] px-4 py-3"
+
+        {/* Category filter */}
+        {products && productCats.length > 1 && (
+          <div className="mb-4 flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setProductCat("all")}
+              className={pill(productCat === "all")}
+            >
+              All
+              <span
+                className={`ml-1.5 rounded-full px-1.5 py-0.5 text-[10px] ${
+                  productCat === "all" ? "bg-white/25" : "bg-brand-dark/10"
+                }`}
               >
-                <div className="min-w-0">
-                  <p className="font-heading truncate text-brand-dark">{p.name}</p>
-                  <p className="text-xs font-semibold uppercase tracking-wide text-brand-dark/45">
-                    {p.type} · ₹{p.price}
-                    {p.availability !== "available" ? ` · ${AVAIL_LABEL[p.availability] ?? p.availability}` : ""}
-                    {" · "}
-                    {p.stock > 0 ? `${p.stock} in stock` : "0 stock"}
-                    {p.images?.length ? ` · ${p.images.length} img` : ""}
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setEditor(p)}
-                  className="shrink-0 cursor-pointer rounded-full border-2 border-brand-dark px-3.5 py-1.5 font-heading text-xs font-black uppercase tracking-wide text-brand-dark transition-colors hover:bg-brand-dark hover:text-brand-cream"
+                {products.length}
+              </span>
+            </button>
+            {productCats.map((c) => (
+              <button
+                key={c.type}
+                type="button"
+                onClick={() => setProductCat(c.type)}
+                className={pill(productCat === c.type)}
+              >
+                {catLabel(c.type)}
+                <span
+                  className={`ml-1.5 rounded-full px-1.5 py-0.5 text-[10px] ${
+                    productCat === c.type ? "bg-white/25" : "bg-brand-dark/10"
+                  }`}
                 >
-                  Edit
-                </button>
-              </div>
+                  {c.count}
+                </span>
+              </button>
             ))}
           </div>
+        )}
+
+        {products ? (
+          visibleProducts.length > 0 ? (
+            <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {visibleProducts.map((p) => (
+                <div
+                  key={p.id}
+                  className="flex items-center justify-between gap-2 rounded-2xl border-2 border-brand-dark/20 bg-[#fbf7ee] px-4 py-3"
+                >
+                  <div className="min-w-0">
+                    <p className="font-heading truncate text-brand-dark">{p.name}</p>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-brand-dark/45">
+                      {p.type} · ₹{p.price}
+                      {p.availability !== "available" ? ` · ${AVAIL_LABEL[p.availability] ?? p.availability}` : ""}
+                      {" · "}
+                      {p.stock > 0 ? `${p.stock} in stock` : "0 stock"}
+                      {p.images?.length ? ` · ${p.images.length} img` : ""}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setEditor(p)}
+                    className="shrink-0 cursor-pointer rounded-full border-2 border-brand-dark px-3.5 py-1.5 font-heading text-xs font-black uppercase tracking-wide text-brand-dark transition-colors hover:bg-brand-dark hover:text-brand-cream"
+                  >
+                    Edit
+                  </button>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="rounded-2xl border-2 border-dashed border-brand-dark/25 bg-[#fbf7ee] p-6 text-center text-brand-dark/55">
+              No products in this category.
+            </p>
+          )
         ) : (
           <p className="mt-4 text-brand-dark/55">Loading products…</p>
         )}

@@ -28,7 +28,7 @@ export default function CartClient() {
     city: "",
     state: "",
     pincode: "",
-    payment: "upi_qr" as "upi_qr",
+    payment: "upi_qr" as const,
   });
 
   const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) =>

@@ -8,6 +8,23 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 /**
+ * Shape of the Razorpay webhook payload we care about. Razorpay sends far
+ * more fields than these; we only read `event` and the payment entity, so the
+ * rest is intentionally ignored rather than modelled.
+ */
+type RazorpayWebhookEvent = {
+  event?: string;
+  payload?: {
+    payment?: {
+      entity?: {
+        id?: string;
+        order_id?: string;
+      };
+    };
+  };
+};
+
+/**
  * Razorpay webhook. Verifies the HMAC signature, then marks the order paid on
  * `payment.captured`. Returns 501 until RAZORPAY keys are configured in env.
  */
@@ -22,9 +39,9 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "invalid signature" }, { status: 400 });
   }
 
-  let event: any;
+  let event: RazorpayWebhookEvent;
   try {
-    event = JSON.parse(raw);
+    event = JSON.parse(raw) as RazorpayWebhookEvent;
   } catch {
     return NextResponse.json({ error: "invalid payload" }, { status: 400 });
   }
