@@ -42,7 +42,7 @@ export function orderConfirmationLink(o: OrderForWhatsApp): string | null {
     `*Total:* ₹${o.amount}`,
     `*Payment:* ${o.paymentLabel}`,
     "",
-    `Your order is confirmed ✅ We'll keep you updated here. — Azésa Chocolates`,
+    `Your order is confirmed ✅ We'll keep you updated here. — Azesa Chocolates`,
   ];
   return `https://wa.me/${digits}?text=${encodeURIComponent(lines.join("\n"))}`;
 }

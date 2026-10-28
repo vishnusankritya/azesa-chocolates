@@ -182,7 +182,7 @@ export default function ProductEditor({ product, onSaved, onClose }: Props) {
       <div className="my-6 w-full max-w-2xl rounded-3xl border-2 border-brand-dark bg-brand-cream p-6 shadow-[6px_6px_0_0_#1c1109] md:p-8">
         <div className="flex items-start justify-between">
           <div>
-            <p className="font-heading text-sm font-black uppercase tracking-[0.15em] text-[#f47920]">Azésa · Admin</p>
+            <p className="font-heading text-sm font-black uppercase tracking-[0.15em] text-[#f47920]">Azesa · Admin</p>
             <h2 className="mt-1 font-heading text-2xl font-black text-brand-dark">
               {product ? `Edit · ${product.name}` : "Add product"}
             </h2>
@@ -265,6 +265,11 @@ export default function ProductEditor({ product, onSaved, onClose }: Props) {
           <div className="flex flex-wrap gap-3">
             {images.map((img, idx) => (
               <div key={img + idx} className="relative h-20 w-20 overflow-hidden rounded-xl border-2 border-brand-dark bg-white">
+                {/* Plain <img> on purpose: admins can attach an arbitrary URL
+                    (not just hosts listed in next.config remotePatterns), and
+                    next/image throws on unconfigured hosts — which would break
+                    the editor. These are tiny admin-only thumbnails. */}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={img} alt="" className="h-full w-full object-contain p-1" loading="lazy" decoding="async" />
                 {idx === 0 ? (
                   <span

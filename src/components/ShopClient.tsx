@@ -50,7 +50,7 @@ export default function ShopClient({
     if (filter === "pinata") return products.filter((p) => PINATA_IDS.includes(p.id));
     if (filter === "hamper") return products.filter((p) => p.type === "hamper");
     return products.filter((p) => p.type === filter);
-  }, [filter]);
+  }, [filter, products]);
 
   const totalPages = useMemo(() => Math.max(1, Math.ceil(visible.length / PAGE_SIZE)), [visible]);
   const pageItems = useMemo(() => visible.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE), [visible, page]);
